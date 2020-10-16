@@ -12,6 +12,7 @@ import org.jfree.data.time.TimeTableXYDataset
 import java.awt.Rectangle
 import javax.swing.JFrame
 import javax.swing.JOptionPane
+import javax.swing.JOptionPane.PLAIN_MESSAGE
 import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
@@ -40,7 +41,7 @@ suspend fun main() {
     // アクセストークンを入力
     var accessToken: String
     while (true) {
-        accessToken = JOptionPane.showInputDialog(frame, "アクセストークンを入力") ?: exitProcess(0) // キャンセルで終了
+        accessToken = JOptionPane.showInputDialog(frame, "アクセストークンを入力", "API", PLAIN_MESSAGE) ?: exitProcess(0) // キャンセルで終了
         if (accessToken.isNotBlank()) break // 入力で無限ループを抜ける
     }
 

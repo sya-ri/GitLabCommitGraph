@@ -28,7 +28,7 @@ data class Commit(val date: Date) {
          * コミット一覧を 日付とコミット数 の一覧に変換
          */
         @ExperimentalStdlibApi
-        fun List<Commit>.compressDate(): SortedMap<Day, Int> {
+        fun List<Commit>.compress(): SortedMap<Day, Int> {
             return map { it.date.truncateTime() }.groupingBy { Day(it) }.eachCount().toSortedMap()
         }
     }

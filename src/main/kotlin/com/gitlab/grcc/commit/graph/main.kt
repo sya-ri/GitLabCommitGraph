@@ -1,6 +1,6 @@
 package com.gitlab.grcc.commit.graph
 
-import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compressDate
+import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compress
 import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
 import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
@@ -65,7 +65,7 @@ suspend fun main() {
     println(commits.size)
 
     // コミットをグラフに反映
-    val compressDates = commits.compressDate()
+    val compressDates = commits.compress()
     var sumCommit = 0
     compressDates.forEach { (day, commit) ->
         sumCommit += commit

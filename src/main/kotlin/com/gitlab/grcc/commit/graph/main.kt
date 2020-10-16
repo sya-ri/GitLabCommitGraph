@@ -17,31 +17,31 @@ import kotlin.system.exitProcess
 @ExperimentalStdlibApi
 suspend fun main() {
     // グラフデータ
-    val data = TimeTableXYDataset()
+    val data = TimeTableXYDataset() // 時間を軸にしたデータ
 
     // 日付とコミットのグラフ作成
     val chart = ChartFactory.createTimeSeriesChart("", "Date", "Commits", data).apply {
         val plot = plot as XYPlot
         plot.renderer = XYLineAndShapeRenderer().apply {
-            defaultShapesVisible = true
+            defaultShapesVisible = true // グラフに点を追加
         }
     }
 
     // グラフ表示
     val frame = JFrame().apply {
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        title = "GitLabCommitGraph"
-        bounds = Rectangle(900, 600)
-        setLocationRelativeTo(null)
-        add(ChartPanel(chart))
-        isVisible = true
+        defaultCloseOperation = JFrame.EXIT_ON_CLOSE // バツボタンの処理
+        title = "GitLabCommitGraph" // ウィンドウタイトル
+        bounds = Rectangle(900, 600) // ウィンドウサイズを指定
+        setLocationRelativeTo(null) // ウィンドウを中心に配置
+        add(ChartPanel(chart)) // チャートパネルをウィンドウの要素に追加
+        isVisible = true // ウィンドウを表示
     }
 
     // アクセストークンを入力
     var accessToken: String
     while (true) {
-        accessToken = JOptionPane.showInputDialog(frame, "アクセストークンを入力") ?: exitProcess(0)
-        if (accessToken.isNotBlank()) break
+        accessToken = JOptionPane.showInputDialog(frame, "アクセストークンを入力") ?: exitProcess(0) // キャンセルで終了
+        if (accessToken.isNotBlank()) break // 入力で無限ループを抜ける
     }
 
     // ApiClient を定義

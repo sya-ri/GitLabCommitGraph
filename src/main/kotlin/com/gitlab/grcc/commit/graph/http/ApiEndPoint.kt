@@ -1,6 +1,6 @@
 package com.gitlab.grcc.commit.graph.http
 
-import io.ktor.http.*
+import io.ktor.http.HttpMethod
 
 sealed class ApiEndPoint(val method: HttpMethod, val path: String) {
     /**
@@ -20,6 +20,9 @@ sealed class ApiEndPoint(val method: HttpMethod, val path: String) {
     class GetCommit(id: String): ApiEndPoint(HttpMethod.Get, "/projects/$id/repository/commits")
 
     companion object {
+        /**
+         * https://docs.gitlab.com/ee/api/README.html#namespaced-path-encoding
+         */
         val String.slashTo2F
             get() = replace("/", "%2F")
     }

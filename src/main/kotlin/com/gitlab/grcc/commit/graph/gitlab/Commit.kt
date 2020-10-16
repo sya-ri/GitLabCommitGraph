@@ -8,6 +8,7 @@ import org.jfree.data.time.Day
 import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
+import java.util.SortedMap
 
 data class Commit(val date: Date) {
     companion object {
@@ -18,8 +19,8 @@ data class Commit(val date: Date) {
         }
 
         @ExperimentalStdlibApi
-        fun List<Commit>.compressDate(): Map<Day, Int> {
-            return map { it.date.truncateTime() }.groupingBy { Day(it) }.eachCount()
+        fun List<Commit>.compressDate(): SortedMap<Day, Int> {
+            return map { it.date.truncateTime() }.groupingBy { Day(it) }.eachCount().toSortedMap()
         }
     }
 }

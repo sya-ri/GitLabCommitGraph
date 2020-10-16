@@ -21,7 +21,7 @@ suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<P
         json.asJsonArray.forEach {
             val jsonObject = it.asJsonObject
             val name = jsonObject["name"].asString
-            val projectGroupId = jsonObject["path"].asString
+            val projectGroupId = jsonObject["path_with_namespace"].asString
             add(Project(name, projectGroupId))
         }
     }

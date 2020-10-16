@@ -14,6 +14,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("io.ktor:ktor-client-okhttp:1.4.1")
     testImplementation(kotlin("test-junit"))
 }
 

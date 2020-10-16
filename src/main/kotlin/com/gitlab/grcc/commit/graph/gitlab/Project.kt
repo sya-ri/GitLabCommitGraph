@@ -9,7 +9,7 @@ data class Project(val name: String, val groupId: String)
 suspend fun GitLabApiClient.getAllProject(groups: Set<Group>): Set<Project> {
     return buildSet {
         groups.forEach { group ->
-            val projectJson = request(ApiEndPoint.GetProject(group.id)) ?: return@buildSet
+            val projectJson = requestJson(ApiEndPoint.GetProject(group.id)) ?: return@buildSet
             projectJson.asJsonArray.forEach {
                 val jsonObject = it.asJsonObject
                 val name = jsonObject["name"].asString

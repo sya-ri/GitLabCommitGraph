@@ -17,18 +17,22 @@ class GitLabApiClient(private val accessToken: String) {
         private const val GITLAB_API_URL = "https://gitlab.com/api/v4"
     }
 
-    suspend fun request(endPoint: ApiEndPoint): JsonElement? {
+    suspend fun request(endPoint: ApiEndPoint, vararg parameters: Pair<String, String>): Pair<HttpResponse, JsonElement>? {
         val response = httpClient.request<HttpResponse> {
             method = endPoint.method
             header(HttpHeaders.Authorization, "Bearer $accessToken")
-            url(GITLAB_API_URL + endPoint.path)
+            url(GITLAB_API_URL + endPoint.path + parameters.joinToString("&", "?") { it.first + "=" + it.second })
         }
         val contentType = response.headers["Content-Type"]
         val body = response.readText()
         return if (contentType?.equals("application/json", true) == true) {
-            gson.fromJson(body, JsonElement::class.java)
+            response to gson.fromJson(body, JsonElement::class.java)
         } else {
             null
         }
+    }
+
+    suspend fun requestJson(endPoint: ApiEndPoint, vararg parameters: Pair<String, String>): JsonElement? {
+        return request(endPoint, *parameters)?.second
     }
 }

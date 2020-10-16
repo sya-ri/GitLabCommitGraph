@@ -9,7 +9,7 @@ data class Group(val id: String)
 suspend fun GitLabApiClient.getAllGroup(groupId: String): Set<Group> {
     return buildSet {
         add(Group(groupId))
-        val subGroupJson = request(ApiEndPoint.GetSubGroup(groupId)) ?: return@buildSet
+        val subGroupJson = requestJson(ApiEndPoint.GetSubGroup(groupId)) ?: return@buildSet
         subGroupJson.asJsonArray.forEach {
             addAll(getAllGroup(groupId + "%2F" + it.asJsonObject["path"].asString))
         }

@@ -52,7 +52,7 @@ suspend fun main() {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         title = "GitLabCommitGraph"
         extendedState = JFrame.MAXIMIZED_BOTH
-        isVisible = true
         add(ChartPanel(chart))
+        isVisible = true
     }
 }

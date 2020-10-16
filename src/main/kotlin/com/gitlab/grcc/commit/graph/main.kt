@@ -9,6 +9,7 @@ import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.time.TimeTableXYDataset
+import java.awt.Rectangle
 import javax.swing.JFrame
 
 
@@ -29,7 +30,8 @@ suspend fun main() {
     JFrame().apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         title = "GitLabCommitGraph"
-        extendedState = JFrame.MAXIMIZED_BOTH
+        bounds = Rectangle(900, 600)
+        setLocationRelativeTo(null)
         add(ChartPanel(chart))
         isVisible = true
     }

@@ -6,7 +6,21 @@ import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 import com.google.gson.Gson
 import java.util.*
 
-data class Commit(val date: Date)
+
+data class Commit(val date: Date) {
+    companion object {
+        private fun Date.truncateTime(): Date {
+            val calendar = Calendar.getInstance()
+            calendar.time = this
+            return GregorianCalendar(calendar[Calendar.YEAR], calendar[Calendar.MONTH], calendar[Calendar.DATE]).time
+        }
+
+        @ExperimentalStdlibApi
+        fun List<Commit>.compressDate(): Map<Date, Int> {
+            return map { it.date.truncateTime() }.groupingBy { it }.eachCount()
+        }
+    }
+}
 
 @ExperimentalStdlibApi
 suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>): List<Commit> {

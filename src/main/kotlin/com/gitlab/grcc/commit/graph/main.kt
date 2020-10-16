@@ -1,8 +1,10 @@
 package com.gitlab.grcc.commit.graph
 
+import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compressDate
 import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
 import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
+import java.text.SimpleDateFormat
 
 @ExperimentalStdlibApi
 suspend fun main() {
@@ -35,4 +37,6 @@ suspend fun main() {
     println()
     println(projects)
     println(commits)
+    val dateFormat = SimpleDateFormat("YYYY/MM/dd")
+    println(commits.compressDate().map { dateFormat.format(it.key) to it.value })
 }

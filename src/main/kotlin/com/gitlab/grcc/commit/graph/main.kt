@@ -11,7 +11,8 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.time.TimeTableXYDataset
 import java.awt.Rectangle
 import javax.swing.JFrame
-
+import javax.swing.JOptionPane
+import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
 suspend fun main() {
@@ -27,7 +28,7 @@ suspend fun main() {
     }
 
     // グラフ表示
-    JFrame().apply {
+    val frame = JFrame().apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         title = "GitLabCommitGraph"
         bounds = Rectangle(900, 600)
@@ -37,17 +38,19 @@ suspend fun main() {
     }
 
     // アクセストークンを入力
-    print("AccessToken: ")
-    val accessToken = readLine()
-    if (accessToken.isNullOrBlank()) return
+    var accessToken: String
+    while (true) {
+        accessToken = JOptionPane.showInputDialog(frame, "アクセストークンを入力") ?: exitProcess(0)
+        if (accessToken.isNotBlank()) break
+    }
+
+    // ApiClient を定義
+    val client = GitLabApiClient(accessToken)
 
     // 取得するトップグループを入力
     print("GroupId: ")
     val groupId = readLine()
     if (groupId.isNullOrBlank()) return
-
-    // ApiClient を定義
-    val client = GitLabApiClient(accessToken)
 
     // プロジェクトの取得
     println()

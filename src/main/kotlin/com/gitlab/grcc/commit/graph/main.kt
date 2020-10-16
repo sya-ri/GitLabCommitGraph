@@ -1,8 +1,6 @@
 package com.gitlab.grcc.commit.graph
 
-import com.gitlab.grcc.commit.graph.gitlab.getAllGroup
 import com.gitlab.grcc.commit.graph.gitlab.getAllProject
-import com.gitlab.grcc.commit.graph.http.ApiEndPoint.Companion.slashTo2F
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 
 @ExperimentalStdlibApi
@@ -20,20 +18,13 @@ suspend fun main() {
     // ApiClient を定義
     val client = GitLabApiClient(accessToken)
 
-    // グループの取得
-    println()
-    print("Getting All Groups ... ")
-    val groups = client.getAllGroup(groupId.slashTo2F)
-    println(groups.size)
-
     // プロジェクトの取得
     println()
     print("Getting All Projects ... ")
-    val projects = client.getAllProject(groups)
+    val projects = client.getAllProject(groupId)
     println(projects.size)
 
     // デバッグメッセージ
     println()
-    println(groups)
     println(projects)
 }

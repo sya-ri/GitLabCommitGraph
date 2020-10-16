@@ -6,18 +6,21 @@ import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 data class Project(val name: String, val groupId: String)
 
 @ExperimentalStdlibApi
-suspend fun GitLabApiClient.getAllProject(groups: Set<Group>, page: Int = 1): Set<Project> {
+suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<Project> {
     return buildSet {
-        groups.forEach { group ->
-            val (response, json) = request(ApiEndPoint.GetProject(group.id), "page" to "$page", "per_page" to "100") ?: return@buildSet
-            val totalPage = response.headers["X-Total-Pages"]?.toIntOrNull()
-            if (totalPage != null && page < totalPage) addAll(getAllProject(groups, page + 1))
-            json.asJsonArray.forEach {
-                val jsonObject = it.asJsonObject
-                val name = jsonObject["name"].asString
-                val projectGroupId = jsonObject["path"].asString
-                add(Project(name, projectGroupId))
-            }
+        val (response, json) = request(
+            ApiEndPoint.GetProject(groupId),
+            "page" to "$page",
+            "per_page" to "100",
+            "include_subgroups" to "true"
+        ) ?: return@buildSet
+        val totalPage = response.headers["X-Total-Pages"]?.toIntOrNull()
+        if (totalPage != null && page < totalPage) addAll(getAllProject(groupId, page + 1))
+        json.asJsonArray.forEach {
+            val jsonObject = it.asJsonObject
+            val name = jsonObject["name"].asString
+            val projectGroupId = jsonObject["path"].asString
+            add(Project(name, projectGroupId))
         }
     }
 }

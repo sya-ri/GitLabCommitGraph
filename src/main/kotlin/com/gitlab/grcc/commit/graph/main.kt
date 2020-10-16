@@ -1,5 +1,6 @@
 package com.gitlab.grcc.commit.graph
 
+import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
 import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 
@@ -24,7 +25,14 @@ suspend fun main() {
     val projects = client.getAllProject(groupId)
     println(projects.size)
 
+    // コミットの取得
+    println()
+    print("Getting All Commits ... ")
+    val commits = client.getAllCommits(projects)
+    println(commits.size)
+
     // デバッグメッセージ
     println()
     println(projects)
+    println(commits)
 }

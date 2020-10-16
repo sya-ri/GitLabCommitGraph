@@ -11,6 +11,14 @@ sealed class ApiEndPoint(val method: HttpMethod, val path: String) {
      */
     class GetProject(id: String): ApiEndPoint(HttpMethod.Get, "/groups/$id/projects")
 
+    /**
+     * https://docs.gitlab.com/ee/api/commits.html#list-repository-commits
+     * ```
+     * GET /projects/:id/repository/commits
+     * ```
+     */
+    class GetCommit(id: String): ApiEndPoint(HttpMethod.Get, "/projects/$id/repository/commits")
+
     companion object {
         val String.slashTo2F
             get() = replace("/", "%2F")

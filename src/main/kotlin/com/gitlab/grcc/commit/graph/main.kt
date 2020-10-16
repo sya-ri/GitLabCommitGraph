@@ -10,9 +10,13 @@ suspend fun main() {
     val accessToken = readLine() ?: return
     print("GroupId: ")
     val groupId = readLine() ?: return
-
     val client = GitLabApiClient(accessToken)
-    println(client.getAllProject(groupId.slashTo2F))
+    println()
+    print("Getting All Projects ... ")
+    val projects = client.getAllProject(groupId.slashTo2F)
+    println(projects.size)
+    println()
+    println(projects)
 }
 
 data class Project(val name: String, val groupId: String)

@@ -6,7 +6,7 @@ import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
-import org.jfree.data.category.DefaultCategoryDataset
+import org.jfree.data.time.TimeTableXYDataset
 import javax.swing.JFrame
 
 
@@ -38,13 +38,14 @@ suspend fun main() {
     println(commits.size)
 
     // 日付とコミットのグラフ作成
-    val data = DefaultCategoryDataset()
+    val data = TimeTableXYDataset()
+    val compressDates = commits.compressDate()
     var sumCommit = 0
-    commits.compressDate().forEach { (date, commit) ->
+    compressDates.forEach { (day, commit) ->
         sumCommit += commit
-        data.addValue(sumCommit, 1, date)
+        data.add(day, sumCommit.toDouble(), 1)
     }
-    val chart = ChartFactory.createLineChart("Test", "Date", "Commits", data)
+    val chart = ChartFactory.createTimeSeriesChart("Test", "Date", "Commits", data)
 
     // グラフ表示
     JFrame().apply {

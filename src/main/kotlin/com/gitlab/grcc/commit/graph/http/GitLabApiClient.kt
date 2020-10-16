@@ -12,8 +12,6 @@ class GitLabApiClient(private val accessToken: String) {
     companion object {
         private val httpClient = HttpClient(OkHttp)
 
-        private val gson = Gson()
-
         private const val GITLAB_API_URL = "https://gitlab.com/api/v4"
     }
 
@@ -26,7 +24,7 @@ class GitLabApiClient(private val accessToken: String) {
         val contentType = response.headers["Content-Type"]
         val body = response.readText()
         return if (contentType?.equals("application/json", true) == true) {
-            response to gson.fromJson(body, JsonElement::class.java)
+            response to Gson().fromJson(body, JsonElement::class.java)
         } else {
             null
         }

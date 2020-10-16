@@ -1,6 +1,7 @@
 package com.gitlab.grcc.commit.graph.gitlab
 
 import com.gitlab.grcc.commit.graph.http.ApiEndPoint
+import com.gitlab.grcc.commit.graph.http.ApiEndPoint.Companion.slashTo2F
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 
 data class Project(val name: String, val groupId: String)
@@ -9,7 +10,7 @@ data class Project(val name: String, val groupId: String)
 suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<Project> {
     return buildSet {
         val (response, json) = request(
-            ApiEndPoint.GetProject(groupId),
+            ApiEndPoint.GetProject(groupId.slashTo2F),
             "page" to "$page",
             "per_page" to "100",
             "simple" to "true",

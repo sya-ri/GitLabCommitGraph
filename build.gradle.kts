@@ -16,6 +16,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("io.ktor:ktor-client-okhttp:1.4.1")
+    implementation("org.jfree:jfreechart:1.5.0")
 }
 
 tasks.withType<KotlinCompile> {

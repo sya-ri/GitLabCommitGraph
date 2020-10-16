@@ -4,7 +4,11 @@ import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compressDate
 import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
 import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
-import java.text.SimpleDateFormat
+import org.jfree.chart.ChartFactory
+import org.jfree.chart.ChartPanel
+import org.jfree.data.category.DefaultCategoryDataset
+import javax.swing.JFrame
+
 
 @ExperimentalStdlibApi
 suspend fun main() {
@@ -33,10 +37,21 @@ suspend fun main() {
     val commits = client.getAllCommits(projects)
     println(commits.size)
 
-    // デバッグメッセージ
-    println()
-    println(projects)
-    println(commits)
-    val dateFormat = SimpleDateFormat("YYYY/MM/dd")
-    println(commits.compressDate().map { dateFormat.format(it.key) to it.value })
+    // 日付とコミットのグラフ作成
+    val data = DefaultCategoryDataset()
+    var sumCommit = 0
+    commits.compressDate().forEach { (date, commit) ->
+        sumCommit += commit
+        data.addValue(sumCommit, 1, date)
+    }
+    val chart = ChartFactory.createLineChart("Test", "Date", "Commits", data)
+
+    // グラフ表示
+    JFrame().apply {
+        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        title = "GitLabCommitGraph"
+        extendedState = JFrame.MAXIMIZED_BOTH
+        isVisible = true
+        add(ChartPanel(chart))
+    }
 }

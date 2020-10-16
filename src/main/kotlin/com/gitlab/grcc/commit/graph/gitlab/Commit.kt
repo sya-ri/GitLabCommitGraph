@@ -4,6 +4,7 @@ import com.gitlab.grcc.commit.graph.http.ApiEndPoint
 import com.gitlab.grcc.commit.graph.http.ApiEndPoint.Companion.slashTo2F
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 import com.google.gson.Gson
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -16,9 +17,23 @@ data class Commit(val date: Date) {
         }
 
         @ExperimentalStdlibApi
-        fun List<Commit>.compressDate(): Map<Date, Int> {
-            return map { it.date.truncateTime() }.groupingBy { it }.eachCount()
+        fun List<Commit>.compressDate(): Map<CommitDate, Int> {
+            return map { it.date.truncateTime() }.groupingBy { CommitDate(it) }.eachCount()
         }
+    }
+}
+
+data class CommitDate(private val date: Date): Comparable<CommitDate> {
+    companion object {
+        private val dateFormat = SimpleDateFormat("MM/dd")
+    }
+
+    override fun toString(): String {
+        return dateFormat.format(date)
+    }
+
+    override fun compareTo(other: CommitDate): Int {
+        return date.compareTo(other.date)
     }
 }
 

@@ -14,6 +14,26 @@ import javax.swing.JFrame
 
 @ExperimentalStdlibApi
 suspend fun main() {
+    // グラフデータ
+    val data = TimeTableXYDataset()
+
+    // 日付とコミットのグラフ作成
+    val chart = ChartFactory.createTimeSeriesChart("", "Date", "Commits", data).apply {
+        val plot = plot as XYPlot
+        plot.renderer = XYLineAndShapeRenderer().apply {
+            defaultShapesVisible = true
+        }
+    }
+
+    // グラフ表示
+    JFrame().apply {
+        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        title = "GitLabCommitGraph"
+        extendedState = JFrame.MAXIMIZED_BOTH
+        add(ChartPanel(chart))
+        isVisible = true
+    }
+
     // アクセストークンを入力
     print("AccessToken: ")
     val accessToken = readLine()
@@ -39,27 +59,11 @@ suspend fun main() {
     val commits = client.getAllCommits(projects)
     println(commits.size)
 
-    // 日付とコミットのグラフ作成
-    val data = TimeTableXYDataset()
+    // コミットをグラフに反映
     val compressDates = commits.compressDate()
     var sumCommit = 0
     compressDates.forEach { (day, commit) ->
         sumCommit += commit
         data.add(day, sumCommit.toDouble(), 1)
-    }
-    val chart = ChartFactory.createTimeSeriesChart("", "Date", "Commits", data).apply {
-        val plot = plot as XYPlot
-        plot.renderer = XYLineAndShapeRenderer().apply {
-            defaultShapesVisible = true
-        }
-    }
-
-    // グラフ表示
-    JFrame().apply {
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        title = "GitLabCommitGraph"
-        extendedState = JFrame.MAXIMIZED_BOTH
-        add(ChartPanel(chart))
-        isVisible = true
     }
 }

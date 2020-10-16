@@ -12,6 +12,7 @@ suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<P
             ApiEndPoint.GetProject(groupId),
             "page" to "$page",
             "per_page" to "100",
+            "simple" to "true",
             "include_subgroups" to "true"
         ) ?: return@buildSet
         val totalPage = response.headers["X-Total-Pages"]?.toIntOrNull()

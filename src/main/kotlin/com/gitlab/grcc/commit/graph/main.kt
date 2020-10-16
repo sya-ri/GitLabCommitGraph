@@ -8,9 +8,11 @@ import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 @ExperimentalStdlibApi
 suspend fun main() {
     print("AccessToken: ")
-    val accessToken = readLine() ?: return
+    val accessToken = readLine()
+    if (accessToken.isNullOrBlank()) return
     print("GroupId: ")
-    val groupId = readLine() ?: return
+    val groupId = readLine()
+    if (groupId.isNullOrBlank()) return
     val client = GitLabApiClient(accessToken)
     println()
     print("Getting All Groups ... ")

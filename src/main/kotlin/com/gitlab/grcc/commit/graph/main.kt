@@ -24,14 +24,6 @@ suspend fun main() {
     // グラフデータ
     val data = TimeTableXYDataset() // 時間を軸にしたデータ
 
-    // 日付とコミットのグラフ作成
-    val chart = ChartFactory.createTimeSeriesChart("", "Date", "Commits", data).apply {
-        val plot = plot as XYPlot
-        plot.renderer = XYLineAndShapeRenderer().apply {
-            defaultShapesVisible = true // グラフに点を追加
-        }
-    }
-
     // アクセス可能なウィンドウ要素
     val bottomLabel: JLabel
 
@@ -42,7 +34,12 @@ suspend fun main() {
         bounds = Rectangle(900, 600) // ウィンドウサイズを指定
         setLocationRelativeTo(null) // ウィンドウを中心に配置
         layout = BorderLayout() // 東西南北・中央で要素を管理
-        add(ChartPanel(chart), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
+        add(ChartPanel(ChartFactory.createTimeSeriesChart("", "Date", "Commits", data).apply {
+            val plot = plot as XYPlot
+            plot.renderer = XYLineAndShapeRenderer().apply {
+                defaultShapesVisible = true // グラフに点を追加
+            }
+        }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
         add(JLabel("label label", JLabel.RIGHT).apply {
             border = EmptyBorder(0, 5, 5, 5) // padding
             background = Color.white // 背景色を白に

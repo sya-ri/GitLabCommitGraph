@@ -8,18 +8,13 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.data.time.TimeSeries
 import org.jfree.data.time.TimeSeriesCollection
 import java.awt.BorderLayout
 import java.awt.Rectangle
-import javax.swing.JButton
-import javax.swing.JDialog
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.JOptionPane
+import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.JOptionPane.PLAIN_MESSAGE
-import javax.swing.JPanel
-import javax.swing.JTextField
 
 @ExperimentalStdlibApi
 fun main() {
@@ -71,7 +66,11 @@ fun main() {
                         })
 
                         fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
-                            val nameText = nameTextField.text ?: return
+                            val nameText = nameTextField.text
+                            if (nameText.isNullOrBlank()) return
+                            data.series.filterIsInstance(TimeSeries::class.java).firstOrNull { (it.key as? String) == nameText }?.let {
+                                data.removeSeries(it)
+                            }
                             val urlText = urlTextField.text ?: return
                             val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
                             addProjectButton.isEnabled = false

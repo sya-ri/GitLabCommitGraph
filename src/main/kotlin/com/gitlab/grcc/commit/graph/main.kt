@@ -1,17 +1,13 @@
 package com.gitlab.grcc.commit.graph
 
-import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compress
+import com.gitlab.grcc.commit.graph.GraphManager.addGraphFromGroup
+import com.gitlab.grcc.commit.graph.GraphManager.addGraphFromProject
 import com.gitlab.grcc.commit.graph.gitlab.Project
-import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
-import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
-import org.jfree.data.time.TimeSeries
 import org.jfree.data.time.TimeSeriesCollection
 import java.awt.BorderLayout
 import java.awt.Rectangle
@@ -56,6 +52,9 @@ fun main() {
                     add(JPanel().apply {
                         val nameTextField: JTextField
                         val urlTextField: JTextField
+                        val addProjectButton: JButton
+                        val addGroupButton: JButton
+
                         add(JLabel("名前"))
                         add(JTextField(32).apply {
                             nameTextField = this
@@ -65,21 +64,35 @@ fun main() {
                             urlTextField = this
                         })
                         add(JButton("プロジェクト として追加").apply {
-                            addActionListener addProject@ {
-                                val nameText = nameTextField.text ?: return@addProject
-                                val urlText = urlTextField.text ?: return@addProject
-                                val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
-                                client.addGraphFromProject(data, nameText, Project(nameText, groupId))
-                            }
+                            addProjectButton = this
                         })
                         add(JButton("グループ として追加").apply {
-                            addActionListener addProject@ {
-                                val nameText = nameTextField.text ?: return@addProject
-                                val urlText = urlTextField.text ?: return@addProject
-                                val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
-                                client.addGraphFromGroup(data, nameText, groupId)
-                            }
+                            addGroupButton = this
                         })
+
+                        addProjectButton.addActionListener addProject@ {
+                            val nameText = nameTextField.text ?: return@addProject
+                            val urlText = urlTextField.text ?: return@addProject
+                            val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
+                            addProjectButton.isEnabled = false
+                            addGroupButton.isEnabled = false
+                            client.addGraphFromProject(data, nameText, Project(nameText, groupId)) {
+                                addProjectButton.isEnabled = true
+                                addGroupButton.isEnabled = true
+                            }
+                        }
+
+                        addGroupButton.addActionListener addProject@ {
+                            val nameText = nameTextField.text ?: return@addProject
+                            val urlText = urlTextField.text ?: return@addProject
+                            val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
+                            addProjectButton.isEnabled = false
+                            addGroupButton.isEnabled = false
+                            client.addGraphFromGroup(data, nameText, groupId) {
+                                addProjectButton.isEnabled = true
+                                addGroupButton.isEnabled = true
+                            }
+                        }
                     })
                     isVisible = true // ウィンドウを表示
                 }
@@ -97,38 +110,4 @@ fun main() {
 
     // ApiClientのアクセストークンを初期化
     client.accessToken = accessToken
-}
-
-@ExperimentalStdlibApi
-fun GitLabApiClient.addGraphFromGroup(data: TimeSeriesCollection, name: String, groupId: String) {
-    GlobalScope.launch {
-        // プロジェクトの取得
-        val projects = getAllProject(groupId)
-
-        // グラフに反映
-        addGraphFromProject(data, name, projects)
-    }
-}
-
-@ExperimentalStdlibApi
-fun GitLabApiClient.addGraphFromProject(data: TimeSeriesCollection, name: String, project: Project) {
-    addGraphFromProject(data, name, setOf(project))
-}
-
-@ExperimentalStdlibApi
-fun GitLabApiClient.addGraphFromProject(data: TimeSeriesCollection, name: String, projects: Set<Project>) {
-    GlobalScope.launch {
-        data.addSeries(TimeSeries(name).apply {
-            // コミットの取得
-            val commits = getAllCommits(projects)
-
-            // コミットをグラフに反映
-            val compressDates = commits.compress()
-            var sumCommit = 0
-            compressDates.forEach { (day, commit) ->
-                sumCommit += commit
-                add(day, sumCommit.toDouble())
-            }
-        })
-    }
 }

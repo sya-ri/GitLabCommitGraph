@@ -16,10 +16,10 @@ import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JOptionPane
+import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.JOptionPane.PLAIN_MESSAGE
 import javax.swing.JPanel
 import javax.swing.JTextField
-import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
 fun main() {
@@ -102,13 +102,50 @@ fun main() {
     }
 
     client.accessToken = enterAccessToken(frame, "アクセストークンを入力")
+    client.onFailure = {
+        when (it) {
+            GitLabApiClient.RequestResult.Failure.NotContent -> {
+                println("not content")
+            }
+            GitLabApiClient.RequestResult.Failure.BadRequest -> {
+                println("bad request")
+            }
+            GitLabApiClient.RequestResult.Failure.Unauthorized -> {
+                client.accessToken = enterAccessToken(frame, "アクセストークンを再入力")
+            }
+            GitLabApiClient.RequestResult.Failure.Forbidden -> {
+                println("forbidden")
+            }
+            GitLabApiClient.RequestResult.Failure.NotFound -> {
+                JOptionPane.showMessageDialog(frame, "プロジェクトもしくはグループが見つかりませんでした", "エラー", ERROR_MESSAGE)
+            }
+            GitLabApiClient.RequestResult.Failure.MethodNotAllowed -> {
+                println("method not allowed")
+            }
+            GitLabApiClient.RequestResult.Failure.Conflict -> {
+                println("conflict")
+            }
+            GitLabApiClient.RequestResult.Failure.RequestDenied -> {
+                println("request denied")
+            }
+            GitLabApiClient.RequestResult.Failure.Unprocessable -> {
+                println("unprocessable")
+            }
+            GitLabApiClient.RequestResult.Failure.ServerError -> {
+                println("server error")
+            }
+            GitLabApiClient.RequestResult.Failure.UnHandle -> {
+                println("unhandle")
+            }
+        }
+    }
 }
 
 fun enterAccessToken(frame: JFrame, message: String): String {
     // アクセストークンを入力
     var accessToken: String
     while (true) {
-        accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE) ?: exitProcess(0) // キャンセルで終了
+        accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE) ?: return ""
         if (accessToken.isNotBlank()) break // 入力で無限ループを抜ける
     }
     return accessToken

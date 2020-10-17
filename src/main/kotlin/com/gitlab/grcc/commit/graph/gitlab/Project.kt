@@ -13,7 +13,7 @@ data class Project(val name: String, val groupId: String)
  * グループに属したプロジェクトを取得します
  */
 @ExperimentalStdlibApi
-suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<Project> {
+suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<Project>? {
     return buildSet {
         val result = request(
             ApiEndPoint.GetProject(groupId.slashTo2F),
@@ -24,10 +24,10 @@ suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<P
         )
         if (result !is GitLabApiClient.RequestResult.Success) {
             onFailure.invoke(result as GitLabApiClient.RequestResult.Failure)
-            return@buildSet
+            return null
         }
         val totalPage = result.response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
-        if (totalPage != null && page < totalPage) addAll(getAllProject(groupId, page + 1))
+        if (totalPage != null && page < totalPage) addAll(getAllProject(groupId, page + 1) ?: return null)
         result.json.asJsonArray.forEach {
             val jsonObject = it.asJsonObject
             val name = jsonObject["name"].asString // プロジェクト名

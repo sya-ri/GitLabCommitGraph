@@ -9,10 +9,14 @@ import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.time.TimeTableXYDataset
+import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Rectangle
 import javax.swing.JFrame
+import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JOptionPane.PLAIN_MESSAGE
+import javax.swing.border.EmptyBorder
 import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
@@ -28,13 +32,23 @@ suspend fun main() {
         }
     }
 
+    // アクセス可能なウィンドウ要素
+    val bottomLabel: JLabel
+
     // グラフ表示
     val frame = JFrame().apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE // バツボタンの処理
         title = "GitLabCommitGraph" // ウィンドウタイトル
         bounds = Rectangle(900, 600) // ウィンドウサイズを指定
         setLocationRelativeTo(null) // ウィンドウを中心に配置
-        add(ChartPanel(chart)) // チャートパネルをウィンドウの要素に追加
+        layout = BorderLayout() // 東西南北・中央で要素を管理
+        add(ChartPanel(chart), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
+        add(JLabel("label label", JLabel.RIGHT).apply {
+            border = EmptyBorder(0, 5, 5, 5) // padding
+            background = Color.white // 背景色を白に
+            isOpaque = true // 背景色を反映
+            bottomLabel = this
+        }, BorderLayout.SOUTH) // ラベルをウィンドウの下に配置
         isVisible = true // ウィンドウを表示
     }
 

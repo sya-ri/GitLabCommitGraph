@@ -68,7 +68,8 @@ fun main() {
                         fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
                             val nameText = nameTextField.text
                             if (nameText.isNullOrBlank()) return
-                            data.series.filterIsInstance(TimeSeries::class.java).firstOrNull { (it.key as? String) == nameText }?.let {
+                            val series = data.series.filterIsInstance(TimeSeries::class.java)
+                            series.firstOrNull { it.key == nameText }?.let {
                                 data.removeSeries(it)
                             }
                             val urlText = urlTextField.text ?: return

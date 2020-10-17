@@ -47,6 +47,7 @@ suspend fun main() {
             addActionListener {
                 JDialog().apply {
                     bounds = Rectangle(450, 130) // ウィンドウサイズを指定
+                    isResizable = false // サイズ変更を無効化
                     setLocationRelativeTo(null) // ウィンドウを中心に配置
                     add(JPanel().apply {
                         add(JLabel("名前"))

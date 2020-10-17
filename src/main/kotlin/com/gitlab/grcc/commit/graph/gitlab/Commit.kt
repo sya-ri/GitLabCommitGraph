@@ -38,13 +38,17 @@ data class Commit(val date: Date) {
  * プロジェクトのコミットを取得します
  */
 @ExperimentalStdlibApi
-suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>): List<Commit> {
+suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>, page: Int = 1): List<Commit> {
     return buildList {
         projects.forEach { project ->
-            val json = requestJson(
+            val (response, json) = request(
                 ApiEndPoint.GetCommit(project.groupId.slashTo2F),
+                "page" to "$page", // ページを指定して取得
+                "per_page" to "100", // ページ毎の取得数を設定
                 "all" to "true" // 全てのコミットを取得
             ) ?: return@forEach
+            val totalPage = response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
+            if (totalPage != null && page < totalPage) addAll(getAllCommits(projects, page + 1))
             json.asJsonArray.forEach {
                 val jsonObject = it.asJsonObject
                 val dateJson = jsonObject["created_at"] // コミットの日付

@@ -101,13 +101,15 @@ fun main() {
         isVisible = true // ウィンドウを表示
     }
 
+    client.accessToken = enterAccessToken(frame, "アクセストークンを入力")
+}
+
+fun enterAccessToken(frame: JFrame, message: String): String {
     // アクセストークンを入力
     var accessToken: String
     while (true) {
-        accessToken = JOptionPane.showInputDialog(frame, "アクセストークンを入力", "API", PLAIN_MESSAGE) ?: exitProcess(0) // キャンセルで終了
+        accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE) ?: exitProcess(0) // キャンセルで終了
         if (accessToken.isNotBlank()) break // 入力で無限ループを抜ける
     }
-
-    // ApiClientのアクセストークンを初期化
-    client.accessToken = accessToken
+    return accessToken
 }

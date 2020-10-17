@@ -11,7 +11,8 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
-import org.jfree.data.time.TimeTableXYDataset
+import org.jfree.data.time.TimeSeries
+import org.jfree.data.time.TimeSeriesCollection
 import java.awt.BorderLayout
 import java.awt.Rectangle
 import javax.swing.JButton
@@ -27,7 +28,7 @@ import kotlin.system.exitProcess
 @ExperimentalStdlibApi
 fun main() {
     // グラフデータ
-    val data = TimeTableXYDataset() // 時間を軸にしたデータ
+    val data = TimeSeriesCollection() // 時間を軸にしたデータ
 
     // ApiClient を定義
     val client = GitLabApiClient()
@@ -99,7 +100,7 @@ fun main() {
 }
 
 @ExperimentalStdlibApi
-fun GitLabApiClient.addGraphFromGroup(data: TimeTableXYDataset, name: String, groupId: String) {
+fun GitLabApiClient.addGraphFromGroup(data: TimeSeriesCollection, name: String, groupId: String) {
     GlobalScope.launch {
         // プロジェクトの取得
         val projects = getAllProject(groupId)
@@ -110,22 +111,24 @@ fun GitLabApiClient.addGraphFromGroup(data: TimeTableXYDataset, name: String, gr
 }
 
 @ExperimentalStdlibApi
-fun GitLabApiClient.addGraphFromProject(data: TimeTableXYDataset, name: String, project: Project) {
+fun GitLabApiClient.addGraphFromProject(data: TimeSeriesCollection, name: String, project: Project) {
     addGraphFromProject(data, name, setOf(project))
 }
 
 @ExperimentalStdlibApi
-fun GitLabApiClient.addGraphFromProject(data: TimeTableXYDataset, name: String, projects: Set<Project>) {
+fun GitLabApiClient.addGraphFromProject(data: TimeSeriesCollection, name: String, projects: Set<Project>) {
     GlobalScope.launch {
-        // コミットの取得
-        val commits = getAllCommits(projects)
+        data.addSeries(TimeSeries(name).apply {
+            // コミットの取得
+            val commits = getAllCommits(projects)
 
-        // コミットをグラフに反映
-        val compressDates = commits.compress()
-        var sumCommit = 0
-        compressDates.forEach { (day, commit) ->
-            sumCommit += commit
-            data.add(day, sumCommit.toDouble(), name)
-        }
+            // コミットをグラフに反映
+            val compressDates = commits.compress()
+            var sumCommit = 0
+            compressDates.forEach { (day, commit) ->
+                sumCommit += commit
+                add(day, sumCommit.toDouble())
+            }
+        })
     }
 }

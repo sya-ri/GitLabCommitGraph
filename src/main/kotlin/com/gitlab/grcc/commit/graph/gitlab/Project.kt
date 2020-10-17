@@ -23,7 +23,8 @@ suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<P
             "include_subgroups" to "true" // サブグループのプロジェクトも含める
         )
         if (result !is GitLabApiClient.RequestResult.Success) {
-            throw GitLabApiClient.RequestFailureException(result)
+            onFailure.invoke(result as GitLabApiClient.RequestResult.Failure)
+            return@buildSet
         }
         val totalPage = result.response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
         if (totalPage != null && page < totalPage) addAll(getAllProject(groupId, page + 1))

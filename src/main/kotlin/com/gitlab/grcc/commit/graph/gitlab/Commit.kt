@@ -48,7 +48,8 @@ suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>, page: Int = 1)
                 "all" to "true" // 全てのコミットを取得
             )
             if (result !is GitLabApiClient.RequestResult.Success) {
-                throw GitLabApiClient.RequestFailureException(result)
+                onFailure.invoke(result as GitLabApiClient.RequestResult.Failure)
+                return@buildList
             }
             val totalPage = result.response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
             if (totalPage != null && page < totalPage) addAll(getAllCommits(projects, page + 1))

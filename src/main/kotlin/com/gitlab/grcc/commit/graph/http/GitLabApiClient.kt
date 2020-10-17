@@ -12,21 +12,21 @@ import io.ktor.client.statement.readText
 import io.ktor.http.HttpHeaders
 
 class GitLabApiClient {
-    class RequestFailureException(val result: RequestResult): Exception()
-
     sealed class RequestResult {
         data class Success(val response: HttpResponse, val json: JsonElement): RequestResult()
-        object NotContent: RequestResult()
-        object BadRequest: RequestResult()
-        object Unauthorized: RequestResult()
-        object Forbidden: RequestResult()
-        object NotFound: RequestResult()
-        object MethodNotAllowed: RequestResult()
-        object Conflict: RequestResult()
-        object RequestDenied: RequestResult()
-        object Unprocessable: RequestResult()
-        object ServerError: RequestResult()
-        object UnHandle: RequestResult()
+        sealed class Failure: RequestResult() {
+            object NotContent: Failure()
+            object BadRequest: Failure()
+            object Unauthorized: Failure()
+            object Forbidden: Failure()
+            object NotFound: Failure()
+            object MethodNotAllowed: Failure()
+            object Conflict: Failure()
+            object RequestDenied: Failure()
+            object Unprocessable: Failure()
+            object ServerError: Failure()
+            object UnHandle: Failure()
+        }
     }
 
     companion object {
@@ -36,6 +36,7 @@ class GitLabApiClient {
     }
 
     lateinit var accessToken: String
+    lateinit var onFailure: (RequestResult.Failure) -> Unit
 
     suspend fun request(endPoint: ApiEndPoint, vararg parameters: Pair<String, String>): RequestResult {
         val response = httpClient.request<HttpResponse> {
@@ -55,48 +56,48 @@ class GitLabApiClient {
                 if (contentType?.equals("application/json", true) == true) {
                     RequestResult.Success(response, Gson().fromJson(body, JsonElement::class.java))
                 } else {
-                    RequestResult.NotContent
+                    RequestResult.Failure.NotContent
                 }
             }
             // 400: Bad Request
             400 -> {
-                RequestResult.BadRequest
+                RequestResult.Failure.BadRequest
             }
             // 401: Unauthorized
             401 -> {
-                RequestResult.Unauthorized
+                RequestResult.Failure.Unauthorized
             }
             // 403: Forbidden
             403 -> {
-                RequestResult.Forbidden
+                RequestResult.Failure.Forbidden
             }
             // 404: Not Found
             404 -> {
-                RequestResult.NotFound
+                RequestResult.Failure.NotFound
             }
             // 405: Method Not Allowed
             405 -> {
-                RequestResult.MethodNotAllowed
+                RequestResult.Failure.MethodNotAllowed
             }
             // 409: Conflict
             409 -> {
-                RequestResult.Conflict
+                RequestResult.Failure.Conflict
             }
             // 412: Request Denied
             412 -> {
-                RequestResult.RequestDenied
+                RequestResult.Failure.RequestDenied
             }
             // 422: Unprocessable
             422 -> {
-                RequestResult.Unprocessable
+                RequestResult.Failure.Unprocessable
             }
             // 500: ServerError
             500 -> {
-                RequestResult.ServerError
+                RequestResult.Failure.ServerError
             }
             // Other
             else -> {
-                RequestResult.UnHandle
+                RequestResult.Failure.UnHandle
             }
         }
     }

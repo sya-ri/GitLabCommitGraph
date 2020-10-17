@@ -5,10 +5,7 @@ import com.gitlab.grcc.commit.graph.http.ApiEndPoint.Companion.slashTo2F
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 import com.google.gson.Gson
 import org.jfree.data.time.Day
-import java.util.Calendar
-import java.util.Date
-import java.util.GregorianCalendar
-import java.util.SortedMap
+import java.util.*
 
 /**
  * コミットデータ
@@ -38,27 +35,37 @@ data class Commit(val date: Date) {
  * プロジェクトのコミットを取得します
  */
 @ExperimentalStdlibApi
-suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>, page: Int = 1): List<Commit>? {
+suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>): List<Commit>? {
     return buildList {
         projects.forEach { project ->
-            val result = request(
-                ApiEndPoint.GetCommit(project.groupId.slashTo2F),
-                "page" to "$page", // ページを指定して取得
-                "per_page" to "100", // ページ毎の取得数を設定
-                "all" to "true" // 全てのコミットを取得
-            )
-            if (result !is GitLabApiClient.RequestResult.Success) {
-                onFailure.invoke(result as GitLabApiClient.RequestResult.Failure)
-                return null
-            }
-            val totalPage = result.response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
-            if (totalPage != null && page < totalPage) addAll(getAllCommits(projects, page + 1) ?: return null)
-            result.json.asJsonArray.forEach {
-                val jsonObject = it.asJsonObject
-                val dateJson = jsonObject["created_at"] // コミットの日付
-                val date = Gson().fromJson(dateJson, Date::class.java) // JsonElement を Date クラスに変換
-                add(Commit(date))
-            }
+            addAll(getAllCommits(project) ?: return null)
+        }
+    }
+}
+
+/**
+ * プロジェクトのコミットを取得します
+ */
+@ExperimentalStdlibApi
+suspend fun GitLabApiClient.getAllCommits(project: Project, page: Int = 1): List<Commit>? {
+    return buildList {
+        val result = request(
+            ApiEndPoint.GetCommit(project.groupId.slashTo2F),
+            "page" to "$page", // ページを指定して取得
+            "per_page" to "100", // ページ毎の取得数を設定
+            "all" to "true" // 全てのコミットを取得
+        )
+        if (result !is GitLabApiClient.RequestResult.Success) {
+            onFailure.invoke(result as GitLabApiClient.RequestResult.Failure)
+            return null
+        }
+        val nextPage = result.response.headers["x-next-page"]?.toIntOrNull() // 次のページを取得
+        if (nextPage != null) addAll(getAllCommits(project, nextPage) ?: return null)
+        result.json.asJsonArray.forEach {
+            val jsonObject = it.asJsonObject
+            val dateJson = jsonObject["created_at"] // コミットの日付
+            val date = Gson().fromJson(dateJson, Date::class.java) // JsonElement を Date クラスに変換
+            add(Commit(date))
         }
     }
 }

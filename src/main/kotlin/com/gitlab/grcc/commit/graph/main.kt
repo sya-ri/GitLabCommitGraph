@@ -26,9 +26,6 @@ suspend fun main() {
     // グラフデータ
     val data = TimeTableXYDataset() // 時間を軸にしたデータ
 
-    // アクセス可能なウィンドウ要素
-    val bottomButton: JButton
-
     // グラフ表示
     val frame = JFrame().apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE // バツボタンの処理
@@ -43,7 +40,6 @@ suspend fun main() {
             }
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
         add(JButton("追加").apply {
-            bottomButton = this
             addActionListener {
                 JDialog().apply {
                     bounds = Rectangle(450, 130) // ウィンドウサイズを指定

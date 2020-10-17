@@ -106,39 +106,43 @@ fun main() {
 
     client.accessToken = enterAccessToken(frame, "アクセストークンを入力")
     client.onFailure = {
+        fun showErrorMessage(message: String) {
+            JOptionPane.showMessageDialog(frame, message, "エラー", ERROR_MESSAGE)
+        }
+
         when (it) {
             GitLabApiClient.RequestResult.Failure.NotContent -> {
-                JOptionPane.showMessageDialog(frame, "Jsonの取得に失敗", "エラー", ERROR_MESSAGE)
+                showErrorMessage("Jsonの取得に失敗")
             }
             GitLabApiClient.RequestResult.Failure.BadRequest -> {
-                JOptionPane.showMessageDialog(frame, "APIリクエストに必要な値が足りません", "エラー", ERROR_MESSAGE)
+                showErrorMessage("APIリクエストに必要な値が足りません")
             }
             GitLabApiClient.RequestResult.Failure.Unauthorized -> {
                 client.accessToken = enterAccessToken(frame, "アクセストークンを再入力")
             }
             GitLabApiClient.RequestResult.Failure.Forbidden -> {
-                JOptionPane.showMessageDialog(frame, "アクセスすることが許可されていません", "エラー", ERROR_MESSAGE)
+                showErrorMessage("アクセスすることが許可されていません")
             }
             GitLabApiClient.RequestResult.Failure.NotFound -> {
-                JOptionPane.showMessageDialog(frame, "プロジェクトもしくはグループが見つかりませんでした", "エラー", ERROR_MESSAGE)
+                showErrorMessage("プロジェクトもしくはグループが見つかりませんでした")
             }
             GitLabApiClient.RequestResult.Failure.MethodNotAllowed -> {
-                JOptionPane.showMessageDialog(frame, "そのリクエストはサポートされていません", "エラー", ERROR_MESSAGE)
+                showErrorMessage("そのリクエストはサポートされていません")
             }
             GitLabApiClient.RequestResult.Failure.Conflict -> {
-                JOptionPane.showMessageDialog(frame, "競合が発生しました", "エラー", ERROR_MESSAGE)
+                showErrorMessage("競合が発生しました")
             }
             GitLabApiClient.RequestResult.Failure.RequestDenied -> {
-                JOptionPane.showMessageDialog(frame, "リクエストが拒否されました", "エラー", ERROR_MESSAGE)
+                showErrorMessage("リクエストが拒否されました")
             }
             GitLabApiClient.RequestResult.Failure.Unprocessable -> {
-                JOptionPane.showMessageDialog(frame, "処理に失敗しました", "エラー", ERROR_MESSAGE)
+                showErrorMessage("処理に失敗しました")
             }
             GitLabApiClient.RequestResult.Failure.ServerError -> {
-                JOptionPane.showMessageDialog(frame, "サーバーでエラーが発生しました", "エラー", ERROR_MESSAGE)
+                showErrorMessage("サーバーでエラーが発生しました")
             }
             GitLabApiClient.RequestResult.Failure.UnHandle -> {
-                JOptionPane.showMessageDialog(frame, "ハンドリングされていないレスポンスコードです", "エラー", ERROR_MESSAGE)
+                showErrorMessage("ハンドリングされていないレスポンスコードです")
             }
         }
     }

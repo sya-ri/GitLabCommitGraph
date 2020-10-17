@@ -70,27 +70,27 @@ fun main() {
                             addGroupButton = this
                         })
 
-                        addProjectButton.addActionListener addProject@ {
-                            val nameText = nameTextField.text ?: return@addProject
-                            val urlText = urlTextField.text ?: return@addProject
+                        fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit) -> Unit) {
+                            val nameText = nameTextField.text ?: return
+                            val urlText = urlTextField.text ?: return
                             val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
                             addProjectButton.isEnabled = false
                             addGroupButton.isEnabled = false
-                            client.addGraphFromProject(data, nameText, Project(nameText, groupId)) {
+                            action.invoke(nameText, groupId) {
                                 addProjectButton.isEnabled = true
                                 addGroupButton.isEnabled = true
                             }
                         }
 
-                        addGroupButton.addActionListener addProject@ {
-                            val nameText = nameTextField.text ?: return@addProject
-                            val urlText = urlTextField.text ?: return@addProject
-                            val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
-                            addProjectButton.isEnabled = false
-                            addGroupButton.isEnabled = false
-                            client.addGraphFromGroup(data, nameText, groupId) {
-                                addProjectButton.isEnabled = true
-                                addGroupButton.isEnabled = true
+                        addProjectButton.addActionListener {
+                            addGraphAction { nameText, groupId, onSuccess ->
+                                client.addGraphFromProject(data, nameText, Project(nameText, groupId), onSuccess)
+                            }
+                        }
+
+                        addGroupButton.addActionListener {
+                            addGraphAction { nameText, groupId, onSuccess ->
+                                client.addGraphFromGroup(data, nameText, groupId, onSuccess)
                             }
                         }
                     })

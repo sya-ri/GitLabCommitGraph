@@ -1,9 +1,12 @@
 package com.gitlab.grcc.commit.graph
 
 import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compress
+import com.gitlab.grcc.commit.graph.gitlab.Project
 import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
 import com.gitlab.grcc.commit.graph.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.XYPlot
@@ -22,9 +25,12 @@ import javax.swing.JTextField
 import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
-suspend fun main() {
+fun main() {
     // グラフデータ
     val data = TimeTableXYDataset() // 時間を軸にしたデータ
+
+    // ApiClient を定義
+    val client = GitLabApiClient()
 
     // グラフ表示
     val frame = JFrame().apply {
@@ -47,12 +53,32 @@ suspend fun main() {
                     isResizable = false // サイズ変更を無効化
                     setLocationRelativeTo(null) // ウィンドウを中心に配置
                     add(JPanel().apply {
+                        val nameTextField: JTextField
+                        val urlTextField: JTextField
                         add(JLabel("名前"))
-                        add(JTextField(32))
+                        add(JTextField(32).apply {
+                            nameTextField = this
+                        })
                         add(JLabel("URL"))
-                        add(JTextField(32))
-                        add(JButton("プロジェクト として追加"))
-                        add(JButton("グループ として追加"))
+                        add(JTextField(32).apply {
+                            urlTextField = this
+                        })
+                        add(JButton("プロジェクト として追加").apply {
+                            addActionListener addProject@ {
+                                val nameText = nameTextField.text ?: return@addProject
+                                val urlText = urlTextField.text ?: return@addProject
+                                val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
+                                client.addGraphFromProject(data, nameText, Project(nameText, groupId))
+                            }
+                        })
+                        add(JButton("グループ として追加").apply {
+                            addActionListener addProject@ {
+                                val nameText = nameTextField.text ?: return@addProject
+                                val urlText = urlTextField.text ?: return@addProject
+                                val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
+                                client.addGraphFromGroup(data, nameText, groupId)
+                            }
+                        })
                     })
                     isVisible = true // ウィンドウを表示
                 }
@@ -68,31 +94,38 @@ suspend fun main() {
         if (accessToken.isNotBlank()) break // 入力で無限ループを抜ける
     }
 
-    // ApiClient を定義
-    val client = GitLabApiClient(accessToken)
+    // ApiClientのアクセストークンを初期化
+    client.accessToken = accessToken
+}
 
-    // 取得するトップグループを入力
-    print("GroupId: ")
-    val groupId = readLine()
-    if (groupId.isNullOrBlank()) return
+@ExperimentalStdlibApi
+fun GitLabApiClient.addGraphFromGroup(data: TimeTableXYDataset, name: String, groupId: String) {
+    GlobalScope.launch {
+        // プロジェクトの取得
+        val projects = getAllProject(groupId)
 
-    // プロジェクトの取得
-    println()
-    print("Getting All Projects ... ")
-    val projects = client.getAllProject(groupId)
-    println(projects.size)
+        // グラフに反映
+        addGraphFromProject(data, name, projects)
+    }
+}
 
-    // コミットの取得
-    println()
-    print("Getting All Commits ... ")
-    val commits = client.getAllCommits(projects)
-    println(commits.size)
+@ExperimentalStdlibApi
+fun GitLabApiClient.addGraphFromProject(data: TimeTableXYDataset, name: String, project: Project) {
+    addGraphFromProject(data, name, setOf(project))
+}
 
-    // コミットをグラフに反映
-    val compressDates = commits.compress()
-    var sumCommit = 0
-    compressDates.forEach { (day, commit) ->
-        sumCommit += commit
-        data.add(day, sumCommit.toDouble(), 1)
+@ExperimentalStdlibApi
+fun GitLabApiClient.addGraphFromProject(data: TimeTableXYDataset, name: String, projects: Set<Project>) {
+    GlobalScope.launch {
+        // コミットの取得
+        val commits = getAllCommits(projects)
+
+        // コミットをグラフに反映
+        val compressDates = commits.compress()
+        var sumCommit = 0
+        compressDates.forEach { (day, commit) ->
+            sumCommit += commit
+            data.add(day, sumCommit.toDouble(), name)
+        }
     }
 }

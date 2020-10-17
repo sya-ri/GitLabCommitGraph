@@ -149,11 +149,8 @@ fun main() {
 }
 
 fun enterAccessToken(frame: JFrame, message: String): String {
-    // アクセストークンを入力
-    var accessToken: String
     while (true) {
-        accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE) ?: return ""
-        if (accessToken.isNotBlank()) break // 入力で無限ループを抜ける
+        val accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE)
+        if (accessToken.isNotBlank()) return accessToken
     }
-    return accessToken
 }

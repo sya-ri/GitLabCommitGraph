@@ -6,12 +6,14 @@ import com.gitlab.grcc.commit.graph.gitlab.Project
 import com.gitlab.grcc.commit.graph.http.GitLabApiClient
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
+import org.jfree.chart.axis.DateAxis
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.time.TimeSeries
 import org.jfree.data.time.TimeSeriesCollection
 import java.awt.BorderLayout
 import java.awt.Rectangle
+import java.text.SimpleDateFormat
 import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.JOptionPane.PLAIN_MESSAGE
@@ -37,6 +39,8 @@ fun main() {
             plot.renderer = XYLineAndShapeRenderer().apply {
                 defaultShapesVisible = true // グラフに点を追加
             }
+            val dateAxis = plot.domainAxis as DateAxis
+            dateAxis.dateFormatOverride = SimpleDateFormat("yyyy/MM/dd")
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
         add(JButton("グラフを追加").apply {
             addActionListener {
@@ -80,14 +84,18 @@ fun main() {
                                 addProjectButton.isEnabled = true
                                 addGroupButton.isEnabled = true
                             }, {
-                                addProjectButton.isEnabled = true
-                                addGroupButton.isEnabled = true
-                            })
+                                              addProjectButton.isEnabled = true
+                                              addGroupButton.isEnabled = true
+                                          })
                         }
 
                         addProjectButton.addActionListener {
                             addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                                client.addGraphFromProject(data, nameText, Project(nameText, groupId), onSuccess, onFailure)
+                                client.addGraphFromProject(data,
+                                                           nameText,
+                                                           Project(nameText, groupId),
+                                                           onSuccess,
+                                                           onFailure)
                             }
                         }
 
@@ -148,7 +156,10 @@ fun main() {
     }
 }
 
-fun enterAccessToken(frame: JFrame, message: String): String {
+fun enterAccessToken(
+    frame: JFrame,
+    message: String
+): String {
     while (true) {
         val accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE)
         if (accessToken.isNotBlank()) return accessToken

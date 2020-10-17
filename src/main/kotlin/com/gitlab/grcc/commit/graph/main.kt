@@ -28,6 +28,7 @@ suspend fun main() {
 
     // グラフ表示
     val frame = JFrame().apply {
+        val frame = this
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE // バツボタンの処理
         title = "GitLabCommitGraph" // ウィンドウタイトル
         bounds = Rectangle(900, 600) // ウィンドウサイズを指定
@@ -41,7 +42,7 @@ suspend fun main() {
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
         add(JButton("グラフを追加").apply {
             addActionListener {
-                JDialog().apply {
+                JDialog(frame).apply {
                     bounds = Rectangle(450, 130) // ウィンドウサイズを指定
                     isResizable = false // サイズ変更を無効化
                     setLocationRelativeTo(null) // ウィンドウを中心に配置

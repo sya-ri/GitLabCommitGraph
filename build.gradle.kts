@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -31,4 +32,8 @@ tasks.withType<Jar> {
             )
         )
     }
+}
+
+tasks.withType<ShadowJar> {
+    archiveFileName.set("${project.name}-${project.version}.jar")
 }

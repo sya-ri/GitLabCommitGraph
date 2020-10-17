@@ -41,15 +41,18 @@ data class Commit(val date: Date) {
 suspend fun GitLabApiClient.getAllCommits(projects: Set<Project>, page: Int = 1): List<Commit> {
     return buildList {
         projects.forEach { project ->
-            val (response, json) = request(
+            val result = request(
                 ApiEndPoint.GetCommit(project.groupId.slashTo2F),
                 "page" to "$page", // ページを指定して取得
                 "per_page" to "100", // ページ毎の取得数を設定
                 "all" to "true" // 全てのコミットを取得
-            ) ?: return@forEach
-            val totalPage = response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
+            )
+            if (result !is GitLabApiClient.RequestResult.Success) {
+                throw GitLabApiClient.RequestFailureException(result)
+            }
+            val totalPage = result.response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
             if (totalPage != null && page < totalPage) addAll(getAllCommits(projects, page + 1))
-            json.asJsonArray.forEach {
+            result.json.asJsonArray.forEach {
                 val jsonObject = it.asJsonObject
                 val dateJson = jsonObject["created_at"] // コミットの日付
                 val date = Gson().fromJson(dateJson, Date::class.java) // JsonElement を Date クラスに変換

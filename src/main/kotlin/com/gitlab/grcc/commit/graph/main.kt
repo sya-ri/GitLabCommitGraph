@@ -39,7 +39,7 @@ suspend fun main() {
                 defaultShapesVisible = true // グラフに点を追加
             }
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
-        add(JButton("追加").apply {
+        add(JButton("グラフを追加").apply {
             addActionListener {
                 JDialog().apply {
                     bounds = Rectangle(450, 130) // ウィンドウサイズを指定

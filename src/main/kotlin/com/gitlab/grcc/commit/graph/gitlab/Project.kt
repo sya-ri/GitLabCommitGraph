@@ -26,8 +26,8 @@ suspend fun GitLabApiClient.getAllProject(groupId: String, page: Int = 1): Set<P
             onFailure.invoke(result as GitLabApiClient.RequestResult.Failure)
             return null
         }
-        val totalPage = result.response.headers["X-Total-Pages"]?.toIntOrNull() // 合計ページ数を取得
-        if (totalPage != null && page < totalPage) addAll(getAllProject(groupId, page + 1) ?: return null)
+        val nextPage = result.response.headers["x-next-page"]?.toIntOrNull() // 次のページを取得
+        if (nextPage != null) addAll(getAllProject(groupId, nextPage) ?: return null)
         result.json.asJsonArray.forEach {
             val jsonObject = it.asJsonObject
             val name = jsonObject["name"].asString // プロジェクト名

@@ -46,11 +46,13 @@ suspend fun main() {
             bottomButton = this
             addActionListener {
                 JDialog().apply {
-                    bounds = Rectangle(450, 90) // ウィンドウサイズを指定
+                    bounds = Rectangle(450, 130) // ウィンドウサイズを指定
                     setLocationRelativeTo(null) // ウィンドウを中心に配置
                     add(JPanel().apply {
+                        add(JLabel("名前"))
+                        add(JTextField(32))
                         add(JLabel("URL"))
-                        add(JTextField(30))
+                        add(JTextField(32))
                         add(JButton("プロジェクト として追加"))
                         add(JButton("グループ として追加"))
                     })

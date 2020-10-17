@@ -12,9 +12,13 @@ import org.jfree.data.time.TimeTableXYDataset
 import java.awt.BorderLayout
 import java.awt.Rectangle
 import javax.swing.JButton
+import javax.swing.JDialog
 import javax.swing.JFrame
+import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JOptionPane.PLAIN_MESSAGE
+import javax.swing.JPanel
+import javax.swing.JTextField
 import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
@@ -40,6 +44,19 @@ suspend fun main() {
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
         add(JButton("追加").apply {
             bottomButton = this
+            addActionListener {
+                JDialog().apply {
+                    bounds = Rectangle(450, 90) // ウィンドウサイズを指定
+                    setLocationRelativeTo(null) // ウィンドウを中心に配置
+                    add(JPanel().apply {
+                        add(JLabel("URL"))
+                        add(JTextField(30))
+                        add(JButton("プロジェクト として追加"))
+                        add(JButton("グループ として追加"))
+                    })
+                    isVisible = true // ウィンドウを表示
+                }
+            }
         }, BorderLayout.SOUTH) // ラベルをウィンドウの下に配置
         isVisible = true // ウィンドウを表示
     }

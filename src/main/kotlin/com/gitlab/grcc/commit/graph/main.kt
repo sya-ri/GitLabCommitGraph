@@ -10,13 +10,11 @@ import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.time.TimeTableXYDataset
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Rectangle
+import javax.swing.JButton
 import javax.swing.JFrame
-import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JOptionPane.PLAIN_MESSAGE
-import javax.swing.border.EmptyBorder
 import kotlin.system.exitProcess
 
 @ExperimentalStdlibApi
@@ -25,7 +23,7 @@ suspend fun main() {
     val data = TimeTableXYDataset() // 時間を軸にしたデータ
 
     // アクセス可能なウィンドウ要素
-    val bottomLabel: JLabel
+    val bottomButton: JButton
 
     // グラフ表示
     val frame = JFrame().apply {
@@ -40,11 +38,8 @@ suspend fun main() {
                 defaultShapesVisible = true // グラフに点を追加
             }
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
-        add(JLabel("label label", JLabel.RIGHT).apply {
-            border = EmptyBorder(0, 5, 5, 5) // padding
-            background = Color.white // 背景色を白に
-            isOpaque = true // 背景色を反映
-            bottomLabel = this
+        add(JButton("追加").apply {
+            bottomButton = this
         }, BorderLayout.SOUTH) // ラベルをウィンドウの下に配置
         isVisible = true // ウィンドウを表示
     }

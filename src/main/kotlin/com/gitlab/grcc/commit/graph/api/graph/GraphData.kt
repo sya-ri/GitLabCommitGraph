@@ -9,6 +9,9 @@ class GraphData {
     private val timeSeriesCollection = TimeSeriesCollection() // 時間を軸にしたデータ
     private val seriesList = mutableMapOf<String, TimeSeries>()
 
+    val seriesNameList
+        get() = seriesList.keys.toList()
+
     private fun addSeries(name: String, series: TimeSeries) {
         seriesList[name] = series
         timeSeriesCollection.addSeries(series)

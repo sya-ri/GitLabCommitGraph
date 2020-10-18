@@ -45,6 +45,11 @@ fun main() {
                     showDialogAddGraph(frame, data, client)
                 }
             })
+            add(JButton("グラフを削除").apply {
+                addActionListener {
+                    showDialogRemoveGraph(frame, data)
+                }
+            })
         }, BorderLayout.SOUTH) // ボタンをウィンドウの下に配置
         isVisible = true // ウィンドウを表示
     }

@@ -3,6 +3,7 @@ package com.gitlab.grcc.commit.graph
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.ChartUtils
 import org.jfree.chart.JFreeChart
+import java.awt.Desktop
 import java.awt.Rectangle
 import java.awt.Toolkit
 import java.io.File
@@ -51,7 +52,10 @@ fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel
                     }
                     val width = widthTextField.text?.toIntOrNull() ?: return
                     val height = heightTextField.text?.toIntOrNull() ?: return
-                    ChartUtils.saveChartAsPNG(File(filePath), chart, width, height)
+                    val savedFile = File(filePath)
+                    ChartUtils.saveChartAsPNG(savedFile, chart, width, height)
+                    dispose()
+                    Desktop.getDesktop().open(savedFile)
                 } catch (ex: IOException) {
                     return
                 }

@@ -15,10 +15,8 @@ class GraphData {
         timeSeriesCollection.addSeries(series)
     }
 
-    suspend fun addSeries(name: String, action: suspend TimeSeries.() -> Unit) {
-        addSeries(name, TimeSeries(name).apply {
-            action.invoke(this)
-        })
+    fun addSeries(name: String, action: TimeSeries.() -> Unit) {
+        addSeries(name, TimeSeries(name).apply(action))
     }
 
     fun removeSeries(name: String) {

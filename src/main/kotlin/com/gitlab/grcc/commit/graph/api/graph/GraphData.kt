@@ -4,13 +4,11 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.data.time.TimeSeries
 import org.jfree.data.time.TimeSeriesCollection
+import javax.swing.table.DefaultTableModel
 
 class GraphData {
     private val timeSeriesCollection = TimeSeriesCollection() // 時間を軸にしたデータ
     private val seriesList = mutableMapOf<String, TimeSeries>()
-
-    val seriesNameList
-        get() = seriesList.keys.toList()
 
     private fun addSeries(name: String, series: TimeSeries) {
         seriesList[name] = series
@@ -31,6 +29,18 @@ class GraphData {
 
     fun containsSeries(name: String): Boolean {
         return seriesList.contains(name)
+    }
+
+    class TableModel(private val data: GraphData): DefaultTableModel() {
+        init {
+            val seriesNameList = data.seriesList.keys.map { arrayOf(it) }.toTypedArray()
+            setDataVector(seriesNameList, arrayOf("グラフ名"))
+        }
+
+        override fun removeRow(row: Int) {
+            data.removeSeries(getValueAt(row, 0) as String)
+            super.removeRow(row)
+        }
     }
 
     companion object {

@@ -10,7 +10,6 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTable
 
-@ExperimentalStdlibApi
 fun showDialogRemoveGraph(frame: JFrame, data: GraphData) {
     JDialog(frame).apply {
         bounds = Rectangle(450, 420) // ウィンドウサイズを指定

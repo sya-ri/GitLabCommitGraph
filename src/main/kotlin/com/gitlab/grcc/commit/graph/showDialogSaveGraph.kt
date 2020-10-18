@@ -1,0 +1,85 @@
+package com.gitlab.grcc.commit.graph
+
+import org.jfree.chart.ChartPanel
+import org.jfree.chart.ChartUtils
+import org.jfree.chart.JFreeChart
+import java.awt.Rectangle
+import java.awt.Toolkit
+import java.io.File
+import java.io.IOException
+import javax.swing.InputVerifier
+import javax.swing.JButton
+import javax.swing.JComponent
+import javax.swing.JDialog
+import javax.swing.JFileChooser
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextField
+import javax.swing.UIManager
+import javax.swing.filechooser.FileNameExtensionFilter
+
+fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel) {
+    JDialog(frame).apply {
+        bounds = Rectangle(450, 130) // ウィンドウサイズを指定
+        isResizable = false // サイズ変更を無効化
+        setLocationRelativeTo(null) // ウィンドウを中心に配置
+        add(JPanel().apply {
+            add(JLabel("横幅"))
+            val widthTextField = add(JTextField(12).apply {
+                text = chartPanel.width.toString()
+                inputVerifier = IntegerInputVerifier()
+            }) as JTextField
+            add(JLabel("高さ"))
+            val heightTextField = add(JTextField(12).apply {
+                text = chartPanel.height.toString()
+                inputVerifier = IntegerInputVerifier()
+            }) as JTextField
+
+            fun saveImageAction(extension: String) {
+                val fileChooser = JFileChooser().apply {
+                    fileFilter = FileNameExtensionFilter("*.$extension", extension)
+                }
+                val result = fileChooser.showSaveDialog(frame)
+                if (result != JFileChooser.APPROVE_OPTION) return
+                val file = fileChooser.selectedFile
+                try {
+                    val filePath = if (file.path.endsWith(".$extension", true)) {
+                        file.path
+                    } else {
+                        file.path + ".$extension"
+                    }
+                    val width = widthTextField.text?.toIntOrNull() ?: return
+                    val height = heightTextField.text?.toIntOrNull() ?: return
+                    ChartUtils.saveChartAsPNG(File(filePath), chart, width, height)
+                } catch (ex: IOException) {
+                    return
+                }
+            }
+
+            add(JButton("PNG で保存").apply {
+                addActionListener {
+                    saveImageAction("png")
+                }
+            })
+            add(JButton("JPEG で保存").apply {
+                addActionListener {
+                    saveImageAction("jpg")
+                }
+            })
+        })
+        isVisible = true // ウィンドウを表示
+    }
+}
+
+internal class IntegerInputVerifier: InputVerifier() {
+    override fun verify(input: JComponent): Boolean {
+        return if ((input as JTextField).text.toIntOrNull() != null) {
+            true
+        } else {
+            UIManager.getLookAndFeel().provideErrorFeedback(input)
+            Toolkit.getDefaultToolkit().beep()
+            false
+        }
+    }
+}

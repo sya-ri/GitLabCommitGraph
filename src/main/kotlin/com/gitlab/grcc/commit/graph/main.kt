@@ -19,6 +19,17 @@ fun main() {
     // グラフデータ
     val data = GraphData()
 
+    // グラフ
+    val chart = GraphData.createTimeSeriesChart("", "Date", "Commits", data).apply {
+        val plot = plot as XYPlot
+        plot.renderer = XYLineAndShapeRenderer().apply {
+            defaultShapesVisible = true // グラフに点を追加
+        }
+        val dateAxis = plot.domainAxis as DateAxis
+        dateAxis.dateFormatOverride = SimpleDateFormat("yyyy/MM/dd")
+    }
+    val chartPanel = ChartPanel(chart)
+
     // ApiClient を定義
     val client = GitLabApiClient()
 
@@ -30,14 +41,7 @@ fun main() {
         bounds = Rectangle(900, 600) // ウィンドウサイズを指定
         setLocationRelativeTo(null) // ウィンドウを中心に配置
         layout = BorderLayout() // 東西南北・中央で要素を管理
-        add(ChartPanel(GraphData.createTimeSeriesChart("", "Date", "Commits", data).apply {
-            val plot = plot as XYPlot
-            plot.renderer = XYLineAndShapeRenderer().apply {
-                defaultShapesVisible = true // グラフに点を追加
-            }
-            val dateAxis = plot.domainAxis as DateAxis
-            dateAxis.dateFormatOverride = SimpleDateFormat("yyyy/MM/dd")
-        }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
+        add(chartPanel, BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
         add(JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             add(JButton("グラフを追加").apply {
@@ -48,6 +52,11 @@ fun main() {
             add(JButton("グラフを削除").apply {
                 addActionListener {
                     showDialogRemoveGraph(frame, data)
+                }
+            })
+            add(JButton("グラフを出力").apply {
+                addActionListener {
+                    showDialogSaveGraph(frame, chart, chartPanel)
                 }
             })
         }, BorderLayout.SOUTH) // ボタンをウィンドウの下に配置

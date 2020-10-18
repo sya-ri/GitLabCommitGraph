@@ -29,6 +29,11 @@ fun showDialogRemoveGraph(frame: JFrame, data: GraphData) {
                     }
                 }
             })
+            add(JButton("全削除").apply {
+                addActionListener {
+                    tableModel.clearRows()
+                }
+            })
         })
         isVisible = true // ウィンドウを表示
     }

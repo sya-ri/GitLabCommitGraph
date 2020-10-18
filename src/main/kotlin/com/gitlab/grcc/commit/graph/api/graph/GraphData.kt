@@ -25,6 +25,11 @@ class GraphData {
         }
     }
 
+    fun clearSeries() {
+        seriesList.clear()
+        timeSeriesCollection.removeAllSeries()
+    }
+
     fun containsSeries(name: String): Boolean {
         return seriesList.contains(name)
     }
@@ -38,6 +43,11 @@ class GraphData {
         override fun removeRow(row: Int) {
             data.removeSeries(getValueAt(row, 0) as String)
             super.removeRow(row)
+        }
+
+        fun clearRows() {
+            data.clearSeries()
+            rowCount = 0
         }
     }
 

@@ -37,7 +37,7 @@ fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel
                 inputVerifier = IntegerInputVerifier()
             }) as JTextField
 
-            fun saveImageAction(extension: String) {
+            fun saveImageAction(extension: String, saveAction: (File, Int, Int) -> Unit) {
                 val fileChooser = JFileChooser().apply {
                     fileFilter = FileNameExtensionFilter("*.$extension", extension)
                 }
@@ -53,7 +53,7 @@ fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel
                     val width = widthTextField.text?.toIntOrNull() ?: return
                     val height = heightTextField.text?.toIntOrNull() ?: return
                     val savedFile = File(filePath)
-                    ChartUtils.saveChartAsPNG(savedFile, chart, width, height)
+                    saveAction.invoke(savedFile, width, height)
                     dispose()
                     Desktop.getDesktop().open(savedFile)
                 } catch (ex: IOException) {
@@ -63,12 +63,16 @@ fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel
 
             add(JButton("PNG で保存").apply {
                 addActionListener {
-                    saveImageAction("png")
+                    saveImageAction("png") { file: File, width: Int, height: Int ->
+                        ChartUtils.saveChartAsPNG(file, chart, width, height)
+                    }
                 }
             })
             add(JButton("JPEG で保存").apply {
                 addActionListener {
-                    saveImageAction("jpg")
+                    saveImageAction("jpg") { file: File, width: Int, height: Int ->
+                        ChartUtils.saveChartAsJPEG(file, chart, width, height)
+                    }
                 }
             })
         })

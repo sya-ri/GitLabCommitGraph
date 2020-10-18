@@ -63,25 +63,13 @@ fun showDialogAddGraph(frame: JFrame, data: TimeSeriesCollection, client: GitLab
 
             addProjectButton.addActionListener {
                 addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                    client.addGraphFromProject(
-                        data,
-                        nameText,
-                        Project(nameText, groupId),
-                        onSuccess,
-                        onFailure
-                    )
+                    client.addGraphFromProject(data, nameText, Project(nameText, groupId), onSuccess, onFailure)
                 }
             }
 
             addGroupButton.addActionListener {
                 addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                    client.addGraphFromGroup(
-                        data,
-                        nameText,
-                        groupId,
-                        onSuccess,
-                        onFailure
-                    )
+                    client.addGraphFromGroup(data, nameText, groupId, onSuccess, onFailure)
                 }
             }
         })

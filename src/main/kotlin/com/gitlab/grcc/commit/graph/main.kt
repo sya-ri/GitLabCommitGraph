@@ -13,9 +13,6 @@ import java.text.SimpleDateFormat
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JFrame
-import javax.swing.JOptionPane
-import javax.swing.JOptionPane.ERROR_MESSAGE
-import javax.swing.JOptionPane.PLAIN_MESSAGE
 import javax.swing.JPanel
 
 @ExperimentalStdlibApi
@@ -53,56 +50,6 @@ fun main() {
         isVisible = true // ウィンドウを表示
     }
 
-    client.accessToken = enterAccessToken(frame, "アクセストークンを入力")
-    client.onFailure = {
-        fun showErrorMessage(message: String) {
-            JOptionPane.showMessageDialog(frame, message, "エラー", ERROR_MESSAGE)
-        }
-
-        when (it) {
-            GitLabApiClient.RequestResult.Failure.NotContent -> {
-                showErrorMessage("Jsonの取得に失敗")
-            }
-            GitLabApiClient.RequestResult.Failure.BadRequest -> {
-                showErrorMessage("APIリクエストに必要な値が足りません")
-            }
-            GitLabApiClient.RequestResult.Failure.Unauthorized -> {
-                client.accessToken = enterAccessToken(frame, "アクセストークンを再入力")
-            }
-            GitLabApiClient.RequestResult.Failure.Forbidden -> {
-                showErrorMessage("アクセスすることが許可されていません")
-            }
-            GitLabApiClient.RequestResult.Failure.NotFound -> {
-                showErrorMessage("プロジェクトもしくはグループが見つかりませんでした")
-            }
-            GitLabApiClient.RequestResult.Failure.MethodNotAllowed -> {
-                showErrorMessage("そのリクエストはサポートされていません")
-            }
-            GitLabApiClient.RequestResult.Failure.Conflict -> {
-                showErrorMessage("競合が発生しました")
-            }
-            GitLabApiClient.RequestResult.Failure.RequestDenied -> {
-                showErrorMessage("リクエストが拒否されました")
-            }
-            GitLabApiClient.RequestResult.Failure.Unprocessable -> {
-                showErrorMessage("処理に失敗しました")
-            }
-            GitLabApiClient.RequestResult.Failure.ServerError -> {
-                showErrorMessage("サーバーでエラーが発生しました")
-            }
-            GitLabApiClient.RequestResult.Failure.UnHandle -> {
-                showErrorMessage("ハンドリングされていないレスポンスコードです")
-            }
-        }
-    }
-}
-
-fun enterAccessToken(
-    frame: JFrame,
-    message: String
-): String {
-    while (true) {
-        val accessToken = JOptionPane.showInputDialog(frame, message, "API", PLAIN_MESSAGE)
-        if (accessToken.isNotBlank()) return accessToken
-    }
+    client.setAccessToken(frame, "アクセストークンを入力")
+    client.setOnFailure(frame)
 }

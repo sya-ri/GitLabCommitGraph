@@ -4,11 +4,11 @@ import com.gitlab.grcc.commit.graph.api.gitlab.Commit.Companion.compress
 import com.gitlab.grcc.commit.graph.api.gitlab.Project
 import com.gitlab.grcc.commit.graph.api.gitlab.getAllCommits
 import com.gitlab.grcc.commit.graph.api.gitlab.getAllProject
+import com.gitlab.grcc.commit.graph.api.graph.GraphData
 import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jfree.data.time.TimeSeries
-import org.jfree.data.time.TimeSeriesCollection
 import java.awt.Rectangle
 import javax.swing.JButton
 import javax.swing.JDialog
@@ -18,7 +18,7 @@ import javax.swing.JPanel
 import javax.swing.JTextField
 
 @ExperimentalStdlibApi
-fun showDialogAddGraph(frame: JFrame, data: TimeSeriesCollection, client: GitLabApiClient) {
+fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) {
     JDialog(frame).apply {
         bounds = Rectangle(450, 130) // ウィンドウサイズを指定
         isResizable = false // サイズ変更を無効化
@@ -34,9 +34,9 @@ fun showDialogAddGraph(frame: JFrame, data: TimeSeriesCollection, client: GitLab
             fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
                 val nameText = nameTextField.text
                 if (nameText.isNullOrBlank()) return
-                val series = data.series.filterIsInstance(TimeSeries::class.java)
+                val series = data.timeSeriesCollection.series.filterIsInstance(TimeSeries::class.java)
                 series.firstOrNull { it.key == nameText }?.let {
-                    data.removeSeries(it)
+                    data.timeSeriesCollection.removeSeries(it)
                 }
                 val urlText = urlTextField.text ?: return
                 val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
@@ -68,7 +68,7 @@ fun showDialogAddGraph(frame: JFrame, data: TimeSeriesCollection, client: GitLab
 }
 
 @ExperimentalStdlibApi
-private fun GitLabApiClient.addGraphFromGroup(data: TimeSeriesCollection, name: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) {
+private fun GitLabApiClient.addGraphFromGroup(data: GraphData, name: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) {
     GlobalScope.launch {
         // プロジェクトの取得
         val projects = getAllProject(groupId) ?: return@launch onFailure.invoke()
@@ -79,14 +79,14 @@ private fun GitLabApiClient.addGraphFromGroup(data: TimeSeriesCollection, name: 
 }
 
 @ExperimentalStdlibApi
-private fun GitLabApiClient.addGraphFromProject(data: TimeSeriesCollection, name: String, project: Project, onSuccess: () -> Unit, onFailure: () -> Unit) {
+private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, project: Project, onSuccess: () -> Unit, onFailure: () -> Unit) {
     addGraphFromProject(data, name, setOf(project), onSuccess, onFailure)
 }
 
 @ExperimentalStdlibApi
-private fun GitLabApiClient.addGraphFromProject(data: TimeSeriesCollection, name: String, projects: Set<Project>, onSuccess: () -> Unit, onFailure: () -> Unit) {
+private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, projects: Set<Project>, onSuccess: () -> Unit, onFailure: () -> Unit) {
     GlobalScope.launch {
-        data.addSeries(TimeSeries(name).apply {
+        data.timeSeriesCollection.addSeries(TimeSeries(name).apply {
             // コミットの取得
             val commits = getAllCommits(projects) ?: return@launch onFailure.invoke()
 

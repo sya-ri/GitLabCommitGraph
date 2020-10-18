@@ -2,7 +2,6 @@ package com.gitlab.grcc.commit.graph
 
 import com.gitlab.grcc.commit.graph.api.graph.GraphData
 import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
-import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.axis.DateAxis
 import org.jfree.chart.plot.XYPlot
@@ -31,7 +30,7 @@ fun main() {
         bounds = Rectangle(900, 600) // ウィンドウサイズを指定
         setLocationRelativeTo(null) // ウィンドウを中心に配置
         layout = BorderLayout() // 東西南北・中央で要素を管理
-        add(ChartPanel(ChartFactory.createTimeSeriesChart("", "Date", "Commits", data.timeSeriesCollection).apply {
+        add(ChartPanel(GraphData.createTimeSeriesChart("", "Date", "Commits", data).apply {
             val plot = plot as XYPlot
             plot.renderer = XYLineAndShapeRenderer().apply {
                 defaultShapesVisible = true // グラフに点を追加

@@ -14,9 +14,16 @@ import org.jfree.data.time.TimeSeriesCollection
 import java.awt.BorderLayout
 import java.awt.Rectangle
 import java.text.SimpleDateFormat
-import javax.swing.*
+import javax.swing.BoxLayout
+import javax.swing.JButton
+import javax.swing.JDialog
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.JOptionPane.PLAIN_MESSAGE
+import javax.swing.JPanel
+import javax.swing.JTextField
 
 @ExperimentalStdlibApi
 fun main() {
@@ -42,73 +49,76 @@ fun main() {
             val dateAxis = plot.domainAxis as DateAxis
             dateAxis.dateFormatOverride = SimpleDateFormat("yyyy/MM/dd")
         }), BorderLayout.CENTER) // チャートパネルをウィンドウの中央に配置
-        add(JButton("グラフを追加").apply {
-            addActionListener {
-                JDialog(frame).apply {
-                    bounds = Rectangle(450, 130) // ウィンドウサイズを指定
-                    isResizable = false // サイズ変更を無効化
-                    setLocationRelativeTo(null) // ウィンドウを中心に配置
-                    add(JPanel().apply {
-                        val nameTextField: JTextField
-                        val urlTextField: JTextField
-                        val addProjectButton: JButton
-                        val addGroupButton: JButton
+        add(JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            add(JButton("グラフを追加").apply {
+                addActionListener {
+                    JDialog(frame).apply {
+                        bounds = Rectangle(450, 130) // ウィンドウサイズを指定
+                        isResizable = false // サイズ変更を無効化
+                        setLocationRelativeTo(null) // ウィンドウを中心に配置
+                        add(JPanel().apply {
+                            val nameTextField: JTextField
+                            val urlTextField: JTextField
+                            val addProjectButton: JButton
+                            val addGroupButton: JButton
 
-                        add(JLabel("名前"))
-                        add(JTextField(32).apply {
-                            nameTextField = this
-                        })
-                        add(JLabel("URL"))
-                        add(JTextField(32).apply {
-                            urlTextField = this
-                        })
-                        add(JButton("プロジェクト として追加").apply {
-                            addProjectButton = this
-                        })
-                        add(JButton("グループ として追加").apply {
-                            addGroupButton = this
-                        })
+                            add(JLabel("名前"))
+                            add(JTextField(32).apply {
+                                nameTextField = this
+                            })
+                            add(JLabel("URL"))
+                            add(JTextField(32).apply {
+                                urlTextField = this
+                            })
+                            add(JButton("プロジェクト として追加").apply {
+                                addProjectButton = this
+                            })
+                            add(JButton("グループ として追加").apply {
+                                addGroupButton = this
+                            })
 
-                        fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
-                            val nameText = nameTextField.text
-                            if (nameText.isNullOrBlank()) return
-                            val series = data.series.filterIsInstance(TimeSeries::class.java)
-                            series.firstOrNull { it.key == nameText }?.let {
-                                data.removeSeries(it)
+                            fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
+                                val nameText = nameTextField.text
+                                if (nameText.isNullOrBlank()) return
+                                val series = data.series.filterIsInstance(TimeSeries::class.java)
+                                series.firstOrNull { it.key == nameText }?.let {
+                                    data.removeSeries(it)
+                                }
+                                val urlText = urlTextField.text ?: return
+                                val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
+                                addProjectButton.isEnabled = false
+                                addGroupButton.isEnabled = false
+                                action.invoke(nameText, groupId, {
+                                    addProjectButton.isEnabled = true
+                                    addGroupButton.isEnabled = true
+                                }, {
+                                                  addProjectButton.isEnabled = true
+                                                  addGroupButton.isEnabled = true
+                                              })
                             }
-                            val urlText = urlTextField.text ?: return
-                            val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
-                            addProjectButton.isEnabled = false
-                            addGroupButton.isEnabled = false
-                            action.invoke(nameText, groupId, {
-                                addProjectButton.isEnabled = true
-                                addGroupButton.isEnabled = true
-                            }, {
-                                              addProjectButton.isEnabled = true
-                                              addGroupButton.isEnabled = true
-                                          })
-                        }
 
-                        addProjectButton.addActionListener {
-                            addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                                client.addGraphFromProject(data,
-                                                           nameText,
-                                                           Project(nameText, groupId),
-                                                           onSuccess,
-                                                           onFailure)
+                            addProjectButton.addActionListener {
+                                addGraphAction { nameText, groupId, onSuccess, onFailure ->
+                                    client.addGraphFromProject(data,
+                                                               nameText,
+                                                               Project(nameText, groupId),
+                                                               onSuccess,
+                                                               onFailure)
+                                }
                             }
-                        }
 
-                        addGroupButton.addActionListener {
-                            addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                                client.addGraphFromGroup(data, nameText, groupId, onSuccess, onFailure)
+                            addGroupButton.addActionListener {
+                                addGraphAction { nameText, groupId, onSuccess, onFailure ->
+                                    client.addGraphFromGroup(data, nameText, groupId, onSuccess, onFailure)
+                                }
                             }
-                        }
-                    })
-                    isVisible = true // ウィンドウを表示
+                        })
+                        isVisible = true // ウィンドウを表示
+                    }
                 }
-            }
-        }, BorderLayout.SOUTH) // ラベルをウィンドウの下に配置
+            }) // ボタン「 グラフを追加 」
+        }, BorderLayout.SOUTH) // ボタンをウィンドウの下に配置
         isVisible = true // ウィンドウを表示
     }
 

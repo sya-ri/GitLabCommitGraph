@@ -32,18 +32,14 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
             val addProjectButton = add(JButton("プロジェクト として追加")) as JButton
             val addGroupButton = add(JButton("グループ として追加")) as JButton
 
-            fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
+            fun addGraphAction(action: (nameText: String, groupId: String) -> Unit) {
                 val nameText = nameTextField.text
                 if (nameText.isNullOrBlank()) return
                 val urlText = urlTextField.text ?: return
                 val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
                 addProjectButton.isEnabled = false
                 addGroupButton.isEnabled = false
-                action.invoke(nameText, groupId, {
-
-                }, {
-
-                })
+                action.invoke(nameText, groupId)
             }
 
             nameTextField.document.addDocumentListener(object: DocumentListener {
@@ -64,14 +60,14 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
             })
 
             addProjectButton.addActionListener {
-                addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                    client.addGraphFromProject(data, nameText, Project(nameText, groupId), onSuccess, onFailure)
+                addGraphAction { nameText, groupId ->
+                    client.addGraphFromProject(data, nameText, Project(nameText, groupId))
                 }
             }
 
             addGroupButton.addActionListener {
-                addGraphAction { nameText, groupId, onSuccess, onFailure ->
-                    client.addGraphFromGroup(data, nameText, groupId, onSuccess, onFailure)
+                addGraphAction { nameText, groupId ->
+                    client.addGraphFromGroup(data, nameText, groupId)
                 }
             }
         })
@@ -80,27 +76,27 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
 }
 
 @ExperimentalStdlibApi
-private fun GitLabApiClient.addGraphFromGroup(data: GraphData, name: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) {
+private fun GitLabApiClient.addGraphFromGroup(data: GraphData, name: String, groupId: String) {
     GlobalScope.launch {
         // プロジェクトの取得
-        val projects = getAllProject(groupId) ?: return@launch onFailure.invoke()
+        val projects = getAllProject(groupId) ?: return@launch
 
         // グラフに反映
-        addGraphFromProject(data, name, projects, onSuccess, onFailure)
+        addGraphFromProject(data, name, projects)
     }
 }
 
 @ExperimentalStdlibApi
-private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, project: Project, onSuccess: () -> Unit, onFailure: () -> Unit) {
-    addGraphFromProject(data, name, setOf(project), onSuccess, onFailure)
+private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, project: Project) {
+    addGraphFromProject(data, name, setOf(project))
 }
 
 @ExperimentalStdlibApi
-private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, projects: Set<Project>, onSuccess: () -> Unit, onFailure: () -> Unit) {
+private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, projects: Set<Project>) {
     GlobalScope.launch {
         data.addSeries(name) {
             // コミットの取得
-            val commits = getAllCommits(projects) ?: return@addSeries onFailure.invoke()
+            val commits = getAllCommits(projects) ?: return@addSeries
 
             // コミットをグラフに反映
             val compressDates = commits.compress()
@@ -110,6 +106,5 @@ private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, p
                 add(day, sumCommit.toDouble())
             }
         }
-        onSuccess.invoke()
     }
 }

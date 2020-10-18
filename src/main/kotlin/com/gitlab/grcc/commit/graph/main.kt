@@ -45,7 +45,7 @@ fun main() {
                 addActionListener {
                     showDialogAddGraph(frame, data, client)
                 }
-            }) // ボタン「 グラフを追加 」
+            })
         }, BorderLayout.SOUTH) // ボタンをウィンドウの下に配置
         isVisible = true // ウィンドウを表示
     }

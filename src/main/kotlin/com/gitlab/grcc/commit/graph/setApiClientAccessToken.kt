@@ -11,6 +11,6 @@ fun GitLabApiClient.setAccessToken(frame: JFrame, message: String) {
 private fun inputAccessToken(frame: JFrame, message: String): String {
     while (true) {
         val accessToken = JOptionPane.showInputDialog(frame, message, "API", JOptionPane.PLAIN_MESSAGE)
-        if (accessToken.isNotBlank()) return accessToken
+        if (!accessToken.isNullOrBlank()) return accessToken
     }
 }

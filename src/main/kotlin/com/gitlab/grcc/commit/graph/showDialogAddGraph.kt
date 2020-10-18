@@ -21,25 +21,12 @@ fun showDialogAddGraph(frame: JFrame, data: TimeSeriesCollection, client: GitLab
         isResizable = false // サイズ変更を無効化
         setLocationRelativeTo(null) // ウィンドウを中心に配置
         add(JPanel().apply {
-            val nameTextField: JTextField
-            val urlTextField: JTextField
-            val addProjectButton: JButton
-            val addGroupButton: JButton
-
             add(JLabel("名前"))
-            add(JTextField(32).apply {
-                nameTextField = this
-            })
+            val nameTextField = JTextField(32).apply { add(this) }
             add(JLabel("URL"))
-            add(JTextField(32).apply {
-                urlTextField = this
-            })
-            add(JButton("プロジェクト として追加").apply {
-                addProjectButton = this
-            })
-            add(JButton("グループ として追加").apply {
-                addGroupButton = this
-            })
+            val urlTextField = JTextField(32).apply { add(this) }
+            val addProjectButton = JButton("プロジェクト として追加").apply { add(this) }
+            val addGroupButton = JButton("グループ として追加").apply { add(this) }
 
             fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
                 val nameText = nameTextField.text

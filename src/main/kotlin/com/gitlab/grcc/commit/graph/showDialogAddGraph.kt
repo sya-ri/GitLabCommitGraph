@@ -8,7 +8,6 @@ import com.gitlab.grcc.commit.graph.api.graph.GraphData
 import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jfree.data.time.TimeSeries
 import java.awt.Rectangle
 import javax.swing.JButton
 import javax.swing.JDialog
@@ -34,9 +33,8 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
             fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
                 val nameText = nameTextField.text
                 if (nameText.isNullOrBlank()) return
-                val series = data.timeSeriesCollection.series.filterIsInstance(TimeSeries::class.java)
-                series.firstOrNull { it.key == nameText }?.let {
-                    data.timeSeriesCollection.removeSeries(it)
+                if (data.containsSeries(nameText)) {
+                    data.removeSeries(nameText)
                 }
                 val urlText = urlTextField.text ?: return
                 val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
@@ -86,9 +84,9 @@ private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, p
 @ExperimentalStdlibApi
 private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, projects: Set<Project>, onSuccess: () -> Unit, onFailure: () -> Unit) {
     GlobalScope.launch {
-        data.timeSeriesCollection.addSeries(TimeSeries(name).apply {
+        data.addSeries(name) {
             // コミットの取得
-            val commits = getAllCommits(projects) ?: return@launch onFailure.invoke()
+            val commits = getAllCommits(projects) ?: return@addSeries onFailure.invoke()
 
             // コミットをグラフに反映
             val compressDates = commits.compress()
@@ -97,7 +95,7 @@ private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, p
                 sumCommit += commit
                 add(day, sumCommit.toDouble())
             }
-        })
+        }
         onSuccess.invoke()
     }
 }

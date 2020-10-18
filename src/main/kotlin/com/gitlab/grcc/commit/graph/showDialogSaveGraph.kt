@@ -54,8 +54,8 @@ fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel
                     val height = heightTextField.text?.toIntOrNull() ?: return
                     val savedFile = File(filePath)
                     saveAction.invoke(savedFile, width, height)
-                    dispose()
                     Desktop.getDesktop().open(savedFile)
+                    dispose()
                 } catch (ex: IOException) {
                     return
                 }

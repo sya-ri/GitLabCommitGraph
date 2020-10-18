@@ -15,6 +15,7 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
+import javax.swing.WindowConstants
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -71,6 +72,8 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
                 }
             }
         })
+        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE // 終了時に破棄する
+        isModal = true // メインウィンドウを操作できなくする
         isVisible = true // ウィンドウを表示
     }
 }

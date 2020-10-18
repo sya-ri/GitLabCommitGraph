@@ -18,6 +18,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.UIManager
+import javax.swing.WindowConstants.DISPOSE_ON_CLOSE
 import javax.swing.filechooser.FileNameExtensionFilter
 
 fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel) {
@@ -76,6 +77,8 @@ fun showDialogSaveGraph(frame: JFrame, chart: JFreeChart, chartPanel: ChartPanel
                 }
             })
         })
+        defaultCloseOperation = DISPOSE_ON_CLOSE // 終了時に破棄する
+        isModal = true // メインウィンドウを操作できなくする
         isVisible = true // ウィンドウを表示
     }
 }

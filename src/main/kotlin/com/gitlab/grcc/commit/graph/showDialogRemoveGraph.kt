@@ -9,6 +9,7 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTable
+import javax.swing.WindowConstants
 
 fun showDialogRemoveGraph(frame: JFrame, data: GraphData) {
     JDialog(frame).apply {
@@ -34,6 +35,8 @@ fun showDialogRemoveGraph(frame: JFrame, data: GraphData) {
                 }
             })
         })
+        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE // 終了時に破棄する
+        isModal = true // メインウィンドウを操作できなくする
         isVisible = true // ウィンドウを表示
     }
 }

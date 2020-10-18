@@ -1,4 +1,4 @@
-package com.gitlab.grcc.commit.graph.http
+package com.gitlab.grcc.commit.graph.api.http
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement

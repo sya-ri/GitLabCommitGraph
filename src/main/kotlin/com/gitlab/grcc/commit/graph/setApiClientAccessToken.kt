@@ -1,6 +1,6 @@
 package com.gitlab.grcc.commit.graph
 
-import com.gitlab.grcc.commit.graph.http.GitLabApiClient
+import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 

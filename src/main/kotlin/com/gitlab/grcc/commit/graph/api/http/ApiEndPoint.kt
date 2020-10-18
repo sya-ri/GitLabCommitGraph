@@ -1,4 +1,4 @@
-package com.gitlab.grcc.commit.graph.http
+package com.gitlab.grcc.commit.graph.api.http
 
 import io.ktor.http.HttpMethod
 

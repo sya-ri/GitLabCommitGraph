@@ -1,6 +1,6 @@
 package com.gitlab.grcc.commit.graph
 
-import com.gitlab.grcc.commit.graph.http.GitLabApiClient
+import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.axis.DateAxis

@@ -1,10 +1,10 @@
 package com.gitlab.grcc.commit.graph
 
-import com.gitlab.grcc.commit.graph.gitlab.Commit.Companion.compress
-import com.gitlab.grcc.commit.graph.gitlab.Project
-import com.gitlab.grcc.commit.graph.gitlab.getAllCommits
-import com.gitlab.grcc.commit.graph.gitlab.getAllProject
-import com.gitlab.grcc.commit.graph.http.GitLabApiClient
+import com.gitlab.grcc.commit.graph.api.gitlab.Commit.Companion.compress
+import com.gitlab.grcc.commit.graph.api.gitlab.Project
+import com.gitlab.grcc.commit.graph.api.gitlab.getAllCommits
+import com.gitlab.grcc.commit.graph.api.gitlab.getAllProject
+import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jfree.data.time.TimeSeries

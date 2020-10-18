@@ -1,8 +1,8 @@
-package com.gitlab.grcc.commit.graph.gitlab
+package com.gitlab.grcc.commit.graph.api.gitlab
 
-import com.gitlab.grcc.commit.graph.http.ApiEndPoint
-import com.gitlab.grcc.commit.graph.http.ApiEndPoint.Companion.slashTo2F
-import com.gitlab.grcc.commit.graph.http.GitLabApiClient
+import com.gitlab.grcc.commit.graph.api.http.ApiEndPoint
+import com.gitlab.grcc.commit.graph.api.http.ApiEndPoint.Companion.slashTo2F
+import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 
 /**
  * プロジェクトデータ

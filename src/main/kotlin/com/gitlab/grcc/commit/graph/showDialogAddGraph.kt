@@ -94,10 +94,10 @@ private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, p
 @ExperimentalStdlibApi
 private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, projects: Set<Project>) {
     GlobalScope.launch {
-        data.addSeries(name) {
-            // コミットの取得
-            val commits = getAllCommits(projects) ?: return@addSeries
+        // コミットの取得
+        val commits = getAllCommits(projects) ?: return@launch
 
+        data.addSeries(name) {
             // コミットをグラフに反映
             val compressDates = commits.compress()
             var sumCommit = 0

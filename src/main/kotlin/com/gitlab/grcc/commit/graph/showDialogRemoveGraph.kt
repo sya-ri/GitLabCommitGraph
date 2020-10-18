@@ -19,9 +19,8 @@ fun showDialogRemoveGraph(frame: JFrame, data: GraphData) {
             val table = add(JTable(tableModel)) as JTable
             add(JButton("選択したプロジェクトを削除").apply {
                 addActionListener {
-                    val selectedRow = table.selectedRow
-                    if (selectedRow != -1) {
-                        tableModel.removeRow(selectedRow)
+                    while (table.selectedRow != -1) {
+                        tableModel.removeRow(table.selectedRow)
                     }
                 }
             })

@@ -15,6 +15,8 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 @ExperimentalStdlibApi
 fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) {
@@ -33,21 +35,33 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
             fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
                 val nameText = nameTextField.text
                 if (nameText.isNullOrBlank()) return
-                if (data.containsSeries(nameText)) {
-                    data.removeSeries(nameText)
-                }
                 val urlText = urlTextField.text ?: return
                 val groupId = urlText.removePrefix("https://gitlab.com/").removeSuffix("/")
                 addProjectButton.isEnabled = false
                 addGroupButton.isEnabled = false
                 action.invoke(nameText, groupId, {
-                    addProjectButton.isEnabled = true
-                    addGroupButton.isEnabled = true
+
                 }, {
-                    addProjectButton.isEnabled = true
-                    addGroupButton.isEnabled = true
+
                 })
             }
+
+            nameTextField.document.addDocumentListener(object: DocumentListener {
+                override fun changedUpdate(e: DocumentEvent) {
+                    val text = e.document.getText(0, e.document.length) ?: return
+                    val isEnabled = data.containsSeries(text).not()
+                    addProjectButton.isEnabled = isEnabled
+                    addGroupButton.isEnabled = isEnabled
+                }
+
+                override fun insertUpdate(e: DocumentEvent) {
+                    changedUpdate(e)
+                }
+
+                override fun removeUpdate(e: DocumentEvent) {
+                    changedUpdate(e)
+                }
+            })
 
             addProjectButton.addActionListener {
                 addGraphAction { nameText, groupId, onSuccess, onFailure ->

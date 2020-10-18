@@ -24,11 +24,11 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
         setLocationRelativeTo(null) // ウィンドウを中心に配置
         add(JPanel().apply {
             add(JLabel("名前"))
-            val nameTextField = JTextField(32).apply { add(this) }
+            val nameTextField = add(JTextField(32)) as JTextField
             add(JLabel("URL"))
-            val urlTextField = JTextField(32).apply { add(this) }
-            val addProjectButton = JButton("プロジェクト として追加").apply { add(this) }
-            val addGroupButton = JButton("グループ として追加").apply { add(this) }
+            val urlTextField = add(JTextField(32)) as JTextField
+            val addProjectButton = add(JButton("プロジェクト として追加")) as JButton
+            val addGroupButton = add(JButton("グループ として追加")) as JButton
 
             fun addGraphAction(action: (nameText: String, groupId: String, onSuccess: () -> Unit, onFailure: () -> Unit) -> Unit) {
                 val nameText = nameTextField.text

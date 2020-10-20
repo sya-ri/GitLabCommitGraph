@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.gitlab.grcc.commit.graph"
-version = "1.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()

@@ -7,17 +7,23 @@ import com.gitlab.grcc.commit.graph.api.gitlab.getAllProject
 import com.gitlab.grcc.commit.graph.api.graph.GraphData
 import com.gitlab.grcc.commit.graph.api.http.GitLabApiClient
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.awt.Rectangle
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.JButton
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.WindowConstants
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+
+private var workingJob: Job? = null
 
 @ExperimentalStdlibApi
 fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) {
@@ -72,6 +78,14 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
                 }
             }
         })
+        addWindowListener(object: WindowAdapter() {
+            override fun windowClosed(e: WindowEvent) {
+                workingJob?.let {
+                    it.cancel()
+                    JOptionPane.showMessageDialog(frame, "キャンセルされました", "", JOptionPane.PLAIN_MESSAGE)
+                }
+            }
+        })
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE // 終了時に破棄する
         isModal = true // メインウィンドウを操作できなくする
         isVisible = true // ウィンドウを表示
@@ -80,9 +94,11 @@ fun showDialogAddGraph(frame: JFrame, data: GraphData, client: GitLabApiClient) 
 
 @ExperimentalStdlibApi
 private fun GitLabApiClient.addGraphFromGroup(data: GraphData, name: String, groupId: String) {
-    GlobalScope.launch {
+    workingJob = GlobalScope.launch {
         // プロジェクトの取得
-        val projects = getAllProject(groupId) ?: return@launch
+        val projects = getAllProject(groupId)
+        workingJob = null
+        if(projects == null) return@launch
 
         // グラフに反映
         addGraphFromProject(data, name, projects)
@@ -96,9 +112,11 @@ private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, p
 
 @ExperimentalStdlibApi
 private fun GitLabApiClient.addGraphFromProject(data: GraphData, name: String, projects: Set<Project>) {
-    GlobalScope.launch {
+    workingJob = GlobalScope.launch {
         // コミットの取得
-        val commits = getAllCommits(projects) ?: return@launch
+        val commits = getAllCommits(projects)
+        workingJob = null
+        if(commits == null) return@launch
 
         data.addSeries(name) {
             // コミットをグラフに反映
